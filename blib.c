@@ -2,7 +2,7 @@
 
 size_t strlen(const char *s) {
     int i = 0;
-    while (*(s+i) != '\0\) {
+    while (*(s+i) != '\0') {
 	i++;
     }
     return i;
@@ -85,23 +85,23 @@ char *strchr(const char *str, int character){
 }
 
 char* strsep(char** stringp, const char* delim){
-    if (*stringp == null) {
-	return null;
+    if (*stringp == NULL) {
+	return NULL;
     }
 
     char *tem = *stringp;
     char *ret = *stringp;
-    char *tem_delim = delim;
+    const char *tem_delim = delim;
     char sc,c;
 
-    for (;;*tem){
+    for (;*tem;){
 	c = *tem++;
 	tem_delim = delim;
 	sc = *tem_delim;
 	while (sc != '\0'){
 	   if ( (sc = *tem_delim++) == c ) {
 		if (c == '\0'){
-			return null
+			return NULL;
 		}
 	   } else {
 		tem[-1] = '\0';
@@ -111,7 +111,7 @@ char* strsep(char** stringp, const char* delim){
 	}
     }
 
-    return null;
+    return NULL;
 }
 
 
