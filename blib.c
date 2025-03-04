@@ -86,7 +86,7 @@ char *strchr(const char *str, int character){
 
 char* strsep(char** stringp, const char* delim){
     if (*stringp == NULL) {
-	return NULL;
+	return (NULL);
     }
 
     char *tem = *stringp;
@@ -94,24 +94,24 @@ char* strsep(char** stringp, const char* delim){
     const char *tem_delim = delim;
     char sc,c;
 
-    for (;*tem;){
+    for (;;){
 	c = *tem++;
 	tem_delim = delim;
-	sc = *tem_delim;
-	while (sc != '\0'){
+	do {
 	   if ( (sc = *tem_delim++) == c ) {
 		if (c == '\0'){
-			return NULL;
+			tem =  NULL;
+		} else {
+			tem[-1] = '\0';
 		}
-	   } else {
-		tem[-1] = '\0';
+
 		*stringp = tem;
-		return ret;
+		return (ret);
 	   }
-	}
+	} while (sc != '\0');
     }
 
-    return NULL;
+    return (NULL);
 }
 
 
