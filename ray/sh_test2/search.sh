@@ -5,4 +5,4 @@ input=$1
 string=$2
 output=$3
 
-grep -n "$string" "$input" | cut -d: -f1 > "output"
+grep -n "$string" "$input" | cut -d: -f1 > "$output"
