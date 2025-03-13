@@ -1,5 +1,5 @@
-i = 0
-while ((i <= 20))
+i=0
+while [i -le 20]
 do
 	touch ./result/code/$((i)).c
 	sed -n 's/REPLACE/$((i))/g' ./origin/code/$((i)).c > ./result/code/$((i)).c
