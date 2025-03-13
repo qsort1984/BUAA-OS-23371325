@@ -1,1 +1,1 @@
-gcc -o ./result/verify *.c
+gcc -o ./result/verify ./result/code/*.c
