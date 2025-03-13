@@ -1,7 +1,22 @@
-a=0
-while [ $a -ne 21 ]
-do
-	touch ./result/code/$a.c
-	sed 's/REPLACE/$a/' origin/code/$a.c > ./result/code/$a.c
-	a=$[$a+1]
-done
+touch ./result/code/0.c
+sed 's/REPLACE/0/' origin/code/0.c > ./result/code/0.c
+sed 's/REPLACE/1/' origin/code/1.c > ./result/code/1.c
+sed 's/REPLACE/2/' origin/code/2.c > ./result/code/2.c
+sed 's/REPLACE/3/' origin/code/3.c > ./result/code/3.c
+sed 's/REPLACE/4/' origin/code/4.c > ./result/code/4.c
+sed 's/REPLACE/5/' origin/code/5.c > ./result/code/5.c
+sed 's/REPLACE/6/' origin/code/6.c > ./result/code/6.c
+sed 's/REPLACE/7/' origin/code/7.c > ./result/code/7.c
+sed 's/REPLACE/8/' origin/code/8.c > ./result/code/8.c
+sed 's/REPLACE/9/' origin/code/9.c > ./result/code/9.c
+sed 's/REPLACE/10/' origin/code/10.c > ./result/code/10.c
+sed 's/REPLACE/11/' origin/code/11.c > ./result/code/11.c
+sed 's/REPLACE/12/' origin/code/12.c > ./result/code/12.c
+sed 's/REPLACE/13/' origin/code/13.c > ./result/code/13.c
+sed 's/REPLACE/14/' origin/code/14.c > ./result/code/14.c
+sed 's/REPLACE/15/' origin/code/15.c > ./result/code/15.c
+sed 's/REPLACE/16/' origin/code/16.c > ./result/code/16.c
+sed 's/REPLACE/17/' origin/code/17.c > ./result/code/17.c
+sed 's/REPLACE/18/' origin/code/18.c > ./result/code/18.c
+sed 's/REPLACE/19/' origin/code/19.c > ./result/code/19.c
+sed 's/REPLACE/20/' origin/code/20.c > ./result/code/20.c
