@@ -1,1 +1,1 @@
-chmod r--r----- ./stderr.txt
+chmod 440 ./stderr.txt
