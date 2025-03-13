@@ -1,7 +1,7 @@
-i=0
-while [i -le 20]
+a=0
+while [ $a -ne 21 ]
 do
-	touch ./result/code/$((i)).c
-	sed -n 's/REPLACE/$((i))/g' ./origin/code/$((i)).c > ./result/code/$((i)).c
-	let i=i+1
+	touch ./result/code/$a.c
+	sed 's/REPLACE/$a/' origin/code/$a.c > ./result/code/$a.c
+	a=$[$a+1]
 done
