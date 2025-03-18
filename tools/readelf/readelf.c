@@ -43,7 +43,7 @@ int readelf(const void *binary, size_t size) {
 	Elf32_Half sh_entry_count;
 	Elf32_Half sh_entry_size;
 	/* Exercise 1.1: Your code here. (1/2) */
-	sh_table = (const void *)(ehdr->e_shoff + (Elf32_Off)binary);
+	sh_table = (const void *)((const char *)binary + ehdr->e_shoff);
 	sh_entry_count = ehdr->e_shnum;
 	sh_entry_size = ehdr->e_shentsize;
 
