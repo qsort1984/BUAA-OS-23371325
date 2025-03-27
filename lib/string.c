@@ -118,8 +118,7 @@ FILE *fmemopen(FILE *stream, void *buf, const char *mode) {
 void myoutputk(void *data, const char *buf, size_t len) {
 	char *tem = ((FILE *)data)->ptr;
 	for (int i = 0; i < len; i++) {
-		tem++;
-		*tem = buf[i];
+		*tem++ = buf[i];
 	}
 	((FILE *)data)->ptr = tem;
 }

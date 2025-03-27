@@ -19,15 +19,15 @@ void vprintfmt(fmt_callback_t out, void *data, const char *fmt, va_list ap) {
 	for (;;) {
 		/* scan for the next '%' */
 		/* Exercise 1.4: Your code here. (1/8) */
-		data = fmt;
+		char *tem = fmt;
 		while (*fmt != '%' && *fmt != '\0') {
 			fmt++;
 		}
 
 		/* flush the string found so far */
 		/* Exercise 1.4: Your code here. (2/8) */
-		if (fmt > data) {
-			out(data, data, fmt - (char *)data);
+		if (fmt > tem) {
+			out(data, tem, fmt - tem);
 		}
 
 
