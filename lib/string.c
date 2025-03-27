@@ -147,14 +147,14 @@ int fseek(FILE *stream, long offset, int fromwhere) {
 	} else if (fromwhere == SEEK_END) {
 		target = stream->end + offset;
 	} else {
-		return 1;
+		return -1;
 	}
 
 	if (target >= stream->base && target <= stream->end) {
 		stream->ptr = target;
 		return 0;
 	} else {
-		return 1;
+		return -1;
 	}
 }
 
