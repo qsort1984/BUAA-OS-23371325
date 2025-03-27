@@ -150,6 +150,24 @@ void vprintfmt(fmt_callback_t out, void *data, const char *fmt, va_list ap) {
 			s = (char *)va_arg(ap, char *);
 			print_str(out, data, s, width, ladjust);
 			break;
+		
+		case 'k':
+			s = (char *)va_arg(ap, char *);
+			if (long_flag) {
+				num = va_arg(ap, long int);
+			} else {
+				num = va_arg(ap, int);
+			}
+
+			print_str(out, data, s, width, ladjust);
+
+			if (num < 0) {
+                                 neg_flag = 1;
+                                 num = -num;
+                        }
+			out(data, " => ", 4);
+                        print_num(out, data, num, 10, neg_flag, width, ladjust, padc, 0);
+			break;
 
 		case '\0':
 			fmt--;
