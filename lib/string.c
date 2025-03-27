@@ -99,12 +99,12 @@ int strcmp(const char *p, const char *q) {
 }
 
 FILE *fmemopen(FILE *stream, void *buf, const char *mode) {
-	if (strcmp(mode, "w")) {
+	if (strcmp(mode, "w") == 0) {
 		stream->ptr = buf;
 		stream->base = buf;
 		stream->end = buf;
 		return stream;
-	} else if (strcmp(mode, "a")) {
+	} else if (strcmp(mode, "a") == 0) {
 		stream->base = buf;
 		char *end = buf + strlen(buf);
 		stream->ptr = end;
@@ -116,7 +116,7 @@ FILE *fmemopen(FILE *stream, void *buf, const char *mode) {
 }
 
 int fmemprintf(FILE *stream, const char *fmt, ...) {
-
+	return 0;
 }
 
 int fseek(FILE *stream, long offset, int fromwhere) {
