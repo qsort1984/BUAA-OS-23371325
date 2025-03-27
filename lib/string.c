@@ -115,8 +115,28 @@ FILE *fmemopen(FILE *stream, void *buf, const char *mode) {
 	}
 }
 
+void myoutputk(void *data, const char *buf, size_t len) {
+	char *tem = ((FILE *)data)->ptr;
+	for (int i = 0; i < len; i++) {
+		tem++;
+		*tem = buf[i];
+	}
+	((FILE *)data)->ptr = tem;
+}
+
 int fmemprintf(FILE *stream, const char *fmt, ...) {
-	return 0;
+	char *base = stream->ptr;
+
+	va_list ap;
+	va_start(ap, fmt);
+	vprintfmt(myoutputk, stream, fmt, ap);
+	va_end(ap);
+
+	if (stream->end < stream->ptr) {
+		stream->end = stream->ptr;
+	}
+
+	return stream->ptr - base;
 }
 
 int fseek(FILE *stream, long offset, int fromwhere) {
