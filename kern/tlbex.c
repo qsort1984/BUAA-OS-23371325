@@ -55,6 +55,9 @@ void _do_tlb_refill(u_long *pentrylo, u_int va, u_int asid) {
 	 *  **While** 'page_lookup' returns 'NULL', indicating that the '*ppte' could not be found,
 	 *  allocate a new page using 'passive_alloc' until 'page_lookup' succeeds.
 	 */
+	while (page_lookup(cur_pgdir, va, &ppte) == NULL) {
+		passive_alloc(va, cur_pgdir, asid);
+	}
 
 	/* Exercise 2.9: Your code here. */
 
