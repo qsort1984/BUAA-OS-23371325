@@ -571,7 +571,7 @@ void *malloc(size_t size) {
 				newblock->padding = 8;
 				//newblock->data = (char *) addr + size + 24;
 				LIST_INSERT_AFTER(mblock,newblock,mb_link);
-			}	
+			}
 			find = 1;
 			break;
 		}
@@ -597,11 +597,11 @@ void free(void *p) {
 	struct MBlock *prev = MBLOCK_PREV(mblock, mb_link);
 	struct MBlock *next = LIST_NEXT(mblock, mb_link);
 
-	if (next->free == 1) {
+	if (next->free == 1 && next->ptr == next->data) {
 		mblock->size += 24 + next->size;
 		LIST_REMOVE(next, mb_link);
 	}
-	if (prev->free == 1) {
+	if (prev->free == 1 && prev->ptr == prev->data) {
 		prev->size += 24 + mblock->size;
 		LIST_REMOVE(mblock, mb_link);
 		mblock = prev;
