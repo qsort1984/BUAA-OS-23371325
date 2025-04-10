@@ -327,6 +327,27 @@ void page_remove(Pde *pgdir, u_int asid, u_long va) {
 }
 /* End of Key Code "page_remove" */
 
+u_int page_conditional_remove(Pde *pgdir, u_int asid, u_int perm_mask, u_long begin_va, u_long end_va) {
+	u_int cnt = 0;	
+
+	for (u_long va = begin_va; va < end_va; va += PAGE_SIZE) {
+		Pte *pte;
+		struct Page *pp = page_lookup(pgdir, va, &pte);
+		if (pp == NULL) {
+			continue;
+		}
+
+		if ((perm_mask & *pte) != 0) {
+			*pte = 0;
+			cnt++;
+			page_decref(pp);
+			tlb_invalidate(asid, va);
+		}
+	}
+
+	return cnt;
+}
+
 void physical_memory_manage_check(void) {
 	struct Page *pp, *pp0, *pp1, *pp2;
 	struct Page_list fl;
