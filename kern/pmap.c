@@ -566,10 +566,9 @@ void *malloc(size_t size) {
 			if (mblock->size >= 32 + size) {
 				struct MBlock *newblock = addr + size;
 				newblock->size = mblock->size - 24 - size;
-				newblock->ptr = addr + size + 24;
+				newblock->ptr = newblock->data;
 				newblock->free = 1;
 				newblock->padding = 8;
-				//newblock->data = (char *) addr + size + 24;
 				LIST_INSERT_AFTER(mblock,newblock,mb_link);
 			}
 			find = 1;
