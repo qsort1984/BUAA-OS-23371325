@@ -596,11 +596,11 @@ void free(void *p) {
 	struct MBlock *prev = MBLOCK_PREV(mblock, mb_link);
 	struct MBlock *next = LIST_NEXT(mblock, mb_link);
 
-	if (next->free == 1 && next->ptr == next->data) {
+	if (next->free == 1) {
 		mblock->size += 24 + next->size;
 		LIST_REMOVE(next, mb_link);
 	}
-	if (prev->free == 1 && prev->ptr == prev->data) {
+	if (prev->free == 1) {
 		prev->size += 24 + mblock->size;
 		LIST_REMOVE(mblock, mb_link);
 		mblock = prev;
