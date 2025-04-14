@@ -568,7 +568,7 @@ void *malloc(size_t size) {
 				newblock->size = mblock->size - 24 - size;
 				newblock->ptr = newblock->data;
 				newblock->free = 1;
-				newblock->padding = 8;
+				mblock->size = size;
 				LIST_INSERT_AFTER(mblock,newblock,mb_link);
 			}
 			find = 1;
