@@ -13,6 +13,7 @@ static struct Env_list env_free_list; // Free list
 
 // Invariant: 'env' in 'env_sched_list' iff. 'env->env_status' is 'RUNNABLE'.
 struct Env_sched_list env_sched_list; // Runnable list
+struct Env_edf_sched_list env_edf_sched_list; // EDF 调度队列
 
 static Pde *base_pgdir;
 
@@ -147,6 +148,7 @@ void env_init(void) {
 	/* Exercise 3.1: Your code here. (1/2) */
 	LIST_INIT(&env_free_list);
 	TAILQ_INIT(&env_sched_list);
+	LIST_INIT(&env_edf_sched_list);
 
 	/* Step 2: Traverse the elements of 'envs' array, set their status to 'ENV_FREE' and insert
 	 * them into the 'env_free_list'. Make sure, after the insertion, the order of envs in the
@@ -371,6 +373,17 @@ struct Env *env_create(const void *binary, size_t size, int priority) {
 	TAILQ_INSERT_HEAD(&env_sched_list, e, env_sched_link);
 
 	return e;
+}
+
+struct Env *env_create_edf(const void *binary, size_t size, int runtime, int period) {
+	// todo
+
+	e->env_edf_runtime = runtime;
+	e->env_edf_period = period;
+	e->env_period_deadline = 0; // 初始化为 0，使进程在首次调用 schedule 函数时触发条件判断，进入首个运行周期
+	e->env_status = ENV_RUNNABLE;
+
+	// todo
 }
 
 /* Overview:
