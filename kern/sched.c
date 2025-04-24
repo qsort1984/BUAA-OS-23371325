@@ -14,7 +14,7 @@
  *   2. Use variable 'env_sched_list', which contains and only contains all runnable envs.
  *   3. You shouldn't use any 'return' statement because this function is 'noreturn'.
  */
-struct Env *rr_env;
+struct Env *last_rr_env;
 void schedule(int yield) {
 	static int clock = -1; // 当前时间片，从 0 开始计数
 	clock++;
@@ -48,18 +48,17 @@ void schedule(int yield) {
 			}
 		}
 	}	
+		if (min_deadline != 0) {
+				env_run(tem);
+				return;
+		}
 
-	if (min_deadline != 0) {
-		rr_env = curenv;
-		env_run(tem);
-		return;
-	}
 
 
 
 	/* (3) 使用课下实现的 RR 算法调度 env_sched_list 中的进程。 */
 	static int count = 0; // remaining time slices of current env
-	struct Env *e = rr_env;
+	struct Env *e = last_rr_env;
 
 	/* We always decrease the 'count' by 1.
 	 *
@@ -89,7 +88,7 @@ void schedule(int yield) {
 		}
 		count = e->env_pri;
 	}
-
+	last_rr_env = e;
 	count--;
 	env_run(e);
 
