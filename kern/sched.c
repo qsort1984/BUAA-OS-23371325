@@ -14,9 +14,52 @@
  *   2. Use variable 'env_sched_list', which contains and only contains all runnable envs.
  *   3. You shouldn't use any 'return' statement because this function is 'noreturn'.
  */
+struct Env *rr_env;
 void schedule(int yield) {
+	static int clock = -1; // 当前时间片，从 0 开始计数
+	clock++;
+
+	/* (1) 遍历 env_edf_sched_list，如果进程进入了新的运行周期（可通过 clock == env_period_deadline 判断），则更新 env_period_deadline，并将 env_runtime_left 设置为 env_edf_runtime。 */
+	/* 在此实现你的代码 */
+	struct Env *env; // 循环变量
+
+	LIST_FOREACH (env, &env_edf_sched_list, env_edf_sched_link) {
+		if (clock == env->env_period_deadline) {
+			env->env_period_deadline += env->env_edf_period;
+			env->env_runtime_left = env->env_edf_runtime;
+		}
+	}
+
+	/* (2) 遍历 env_edf_sched_list，选取 env_runtime_left 大于 0 且 env_period_deadline 最小的进程调度（若相同，则选择 env_id 最小的进程）。如果不存在这样的进程，则不进行调度。 */
+	/* 在此实现你的代码 */
+	u_int min_deadline = 0;
+	u_int min_id = 0;
+	struct Env *tem;
+	LIST_FOREACH (env, &env_edf_sched_list, env_edf_sched_link) {
+		if (env->env_runtime_left > 0) {
+			if (min_deadline == 0) {
+				min_deadline = env->env_period_deadline;
+				min_id = env->env_id;
+				tem = env;
+			} else if (env->env_period_deadline < min_deadline || (env->env_period_deadline == min_deadline && env->env_id < min_id )) {
+				min_deadline = env->env_period_deadline;
+				min_id = env->env_id;
+				tem = env;
+			}
+		}
+	}	
+
+	if (min_deadline != 0) {
+		rr_env = curenv;
+		env_run(tem);
+		return;
+	}
+
+
+
+	/* (3) 使用课下实现的 RR 算法调度 env_sched_list 中的进程。 */
 	static int count = 0; // remaining time slices of current env
-	struct Env *e = curenv;
+	struct Env *e = rr_env;
 
 	/* We always decrease the 'count' by 1.
 	 *
