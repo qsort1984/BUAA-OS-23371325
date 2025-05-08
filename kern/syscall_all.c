@@ -267,7 +267,7 @@ int sys_exofork(void) {
 	e->env_tf.regs[2] = 0;
 
 	/* Step 4: Set up the new env's 'env_status' and 'env_pri'.  */
-	/* Exercise 4.9: Your code here. (4/4) */n
+	/* Exercise 4.9: Your code here. (4/4) */
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_pri = curenv->env_pri;
 
@@ -330,7 +330,7 @@ int sys_set_env_status(u_int envid, u_int status) {
 int sys_set_trapframe(u_int envid, struct Trapframe *tf) {
 	if (is_illegal_va_range((u_long)tf, sizeof *tf)) {
 		return -E_INVAL;
-	}n
+	}
 	struct Env *env;
 	try(envid2env(envid, &env, 1));
 	if (env == curenv) {
@@ -431,7 +431,7 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_perm = PTE_V | perm;
 	e->env_ipc_recving = 0;
-n
+
 	/* Step 5: Set the target's status to 'ENV_RUNNABLE' again and insert it to the tail of
 	 * 'env_sched_list'. */
 	/* Exercise 4.8: Your code here. (7/8) */
