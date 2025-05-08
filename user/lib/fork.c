@@ -85,7 +85,7 @@ static void duppage(u_int envid, u_int vpn) {
 	perm = vpt[vpn] & ((1 << PGSHIFT) - 1);
 
 	//如果当前页被标记为 PTE_PROTECT，则提前结束函数、不进行后续的任何操作
-	if ((perm & PTE_PROTECT) && (perm & PTE_D)) {
+	if (perm & PTE_PROTECT) {
 		return;
 	}
 
