@@ -85,7 +85,7 @@ static void duppage(u_int envid, u_int vpn) {
 	perm = vpt[vpn] & ((1 << PGSHIFT) - 1);
 
 	//如果当前页被标记为 PTE_PROTECT，则提前结束函数、不进行后续的任何操作
-	if (perm & PTE_PROTECT) {
+	if ((perm & PTE_PROTECT) && (perm & PTE_D)) {
 		return;
 	}
 
@@ -144,7 +144,7 @@ int fork(void) {
 	// Hint: You should use 'duppage'.
 	/* Exercise 4.15: Your code here. (1/2) */
 	for (i = 0; i < PDX(UXSTACKTOP); i++) {
-		if ((vpd[i] & PTE_V) && (vpd[i] & PTE_PROTECT) == 0) {
+		if (vpd[i] & PTE_V) {
 			for (u_int j = 0; j < PAGE_SIZE / sizeof(Pte); j++) {
 				u_long va = (i * (PAGE_SIZE / sizeof(Pte)) + j) << PGSHIFT;
 				if (va >= USTACKTOP) {
