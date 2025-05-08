@@ -36,6 +36,10 @@ int sys_print_cons(const void *s, u_int num) {
 	return 0;
 }
 
+int sys_get_ppid(void) {
+	return curenv->env_parent_id;
+}
+
 /* Overview:
  *	This function provides the environment id of current process.
  *
@@ -263,7 +267,7 @@ int sys_exofork(void) {
 	e->env_tf.regs[2] = 0;
 
 	/* Step 4: Set up the new env's 'env_status' and 'env_pri'.  */
-	/* Exercise 4.9: Your code here. (4/4) */
+	/* Exercise 4.9: Your code here. (4/4) */n
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_pri = curenv->env_pri;
 
@@ -326,7 +330,7 @@ int sys_set_env_status(u_int envid, u_int status) {
 int sys_set_trapframe(u_int envid, struct Trapframe *tf) {
 	if (is_illegal_va_range((u_long)tf, sizeof *tf)) {
 		return -E_INVAL;
-	}
+	}n
 	struct Env *env;
 	try(envid2env(envid, &env, 1));
 	if (env == curenv) {
@@ -356,7 +360,7 @@ void sys_panic(char *msg) {
  *
  * Post-Condition:
  *   Return 0 on success.
- *   Return -E_INVAL: 'dstva' is neither 0 nor a legal address.
+ *   Return -E_INVAL: 'dstva' is neither 0 nor a legal address.n
  */
 int sys_ipc_recv(u_int dstva) {
 	/* Step 1: Check if 'dstva' is either zero or a legal address. */
@@ -533,6 +537,7 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_cgetc] = sys_cgetc,
     [SYS_write_dev] = sys_write_dev,
     [SYS_read_dev] = sys_read_dev,
+	[SYS_get_ppid] = sys_get_ppid,
 };
 
 /* Overview:
