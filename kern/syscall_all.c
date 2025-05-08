@@ -47,7 +47,7 @@ int sys_get_ppid(void) {
  * 	return the current environment id
  */
 u_int sys_getenvid(void) {
-	return curenv->env_id;
+	return (int) curenv->env_id;
 }
 
 /* Overview:
@@ -431,7 +431,7 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 	e->env_ipc_from = curenv->env_id;
 	e->env_ipc_perm = PTE_V | perm;
 	e->env_ipc_recving = 0;
-
+n
 	/* Step 5: Set the target's status to 'ENV_RUNNABLE' again and insert it to the tail of
 	 * 'env_sched_list'. */
 	/* Exercise 4.8: Your code here. (7/8) */
