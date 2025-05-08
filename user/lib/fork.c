@@ -144,7 +144,7 @@ int fork(void) {
 	// Hint: You should use 'duppage'.
 	/* Exercise 4.15: Your code here. (1/2) */
 	for (i = 0; i < PDX(UXSTACKTOP); i++) {
-		if (vpd[i] & PTE_V) {
+		if ((vpd[i] & PTE_V) && ((vpd[i] & PTE_PROTECT) == 0)) {
 			for (u_int j = 0; j < PAGE_SIZE / sizeof(Pte); j++) {
 				u_long va = (i * (PAGE_SIZE / sizeof(Pte)) + j) << PGSHIFT;
 				if (va >= USTACKTOP) {
