@@ -47,7 +47,7 @@ int sys_get_ppid(void) {
  * 	return the current environment id
  */
 u_int sys_getenvid(void) {
-	return (int) curenv->env_id;
+	return curenv->env_id;
 }
 
 /* Overview:
