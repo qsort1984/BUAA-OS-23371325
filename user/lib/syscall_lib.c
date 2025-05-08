@@ -65,7 +65,7 @@ int syscall_cgetc() {
 	return msyscall(SYS_cgetc);
 }
 
-int syscall_get_parent_envid() {
+int syscall_get_parent_envid(void) {
 	return msyscall(SYS_get_ppid);
 }
 
