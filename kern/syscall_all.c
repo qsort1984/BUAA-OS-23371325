@@ -56,6 +56,15 @@ int sys_shm_bind(int key, u_int va, u_int perm) {
 	}
 
 	// Lab4-Extra: Your code here. (6/8)
+	if (shm_pool[key].open == 0) {
+		return -E_SHM_NOT_OPEN;
+	}
+
+	int npage = shm_pool[key].napge;
+
+	for (int i = 0; i < npage; i++) {
+		
+	}
 
 	return 0;
 }
