@@ -37,7 +37,7 @@ int sys_print_cons(const void *s, u_int num) {
 }
 
 int sys_get_ppid(void) {
-	return curenv->env_parent_id;
+	return (int)curenv->env_parent_id;
 }
 
 /* Overview:
