@@ -36,15 +36,28 @@ void do_adel(struct Trapframe *tf) {
  	// 在此实现相应操作以使修改后指令符合要求
 	u_long epc = tf->cp0_epc;
 	Pte *p;
-	struct Page *page = page_lookup(curenv->env_pgdir, epc, &p);
+	page_lookup(curenv->env_pgdir, epc, &p);
 	u_long instr_pa = ((*p >> 12) << 12) | (epc & ((1 << 12) - 1));
 	u_long *instr_va = (u_long *)KADDR(instr_pa);
 	u_long instr = *instr_va;
-	u_long new_instr = instr & ~0x3;
+	u_long imm = instr & ((1 << 16) - 1);
+	u_long i = instr & ((1 << 26) - (1 << 21));
+	u_long base = tf->regs[i];
+	u_long new_instr = ((imm + base) & ~0x3) - base;
 	*instr_va = new_instr;
 	printk("AdEL handled, new imm is : %04x\n", new_instr & 0xffff); // 这里的 new_inst 替换为修改后的指令
 }
 
 void do_ades(struct Trapframe *tf) {
  	// 在此实现相应操作以使修改后指令符合要求
+	u_long epc = tf->cp0_epc;
+	Pte *p;
+	page_lookup(curenv->env_pgdir, epc, &p);
+	u_long instr_pa = ((*p >> 12) << 12) | (epc & ((1 << 12) - 1));
+	u_long *instr_va = (u_long *)KADDR(instr_pa);
+	u_long instr = *instr_va;
+	u_long new_instr = instr & ~0x3;
+	*instr_va = new_instr;
+	printk("AdES handled, new imm is : %04x\n", new_instr & 0xffff); // 这里的 new_inst 替换为修改后的指令
+
 }
