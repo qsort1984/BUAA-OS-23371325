@@ -5,14 +5,10 @@
 #include <printk.h>
 #include <sched.h>
 #include <syscall.h>
-
-// extra
 #include <shm.h>
 
 extern struct Env *curenv;
 struct Shm shm_pool[N_SHM];
-
-// extra新增
 
 int sys_shm_new(u_int npage) {
 	if (npage == 0 || npage > N_SHM_PAGE) {
@@ -20,44 +16,24 @@ int sys_shm_new(u_int npage) {
 	}
 
 	// Lab4-Extra: Your code here. (5/8)
-	
-	// 找到一个编号最小的，未被分配的（open = 0）的共享内存
-	int index;
-	for(index = 0; index < N_SHM; index++) {
-		if (shm_pool[index].open == 0) {
-			break; // 找到了
-		}
-	}
-	if (index == N_SHM) {
-		return -E_SHM_INVALID; // 找不到
-	}
-	// 使用 page_alloc 函数申请 npage 个页面，进行必要的操作后，记录在 pages 数组中
-	int i;
-	struct Page *pp = NULL;
-	struct Page *temp_pages[N_SHM_PAGE]; // 临时数组，存放已经分配的页面
-	for (i = 0; i < npage; i++) {
-		if (page_alloc(&pp) == -E_NO_MEM) {
-			// 分配失败，避免内存泄漏，释放已经被分配的页面
-			int j;
-			for (j = 0; j < i; j++) {
-				page_decref(temp_pages[j]);
+	for (int i = 0; i < N_SHM; i++) {
+		if (shm_pool[i].open == 0) {
+			for (int j = 0; j < npage; j++) {
+				if (page_alloc(&(shm_pool[i].pages[j]))) {
+					for (int k = 0; k < j; k++) {
+						page_decref(shm_pool[i].pages[k]);
+					}
+					return -E_NO_MEM;
+				}
+				shm_pool[i].pages[j]->pp_ref++;
 			}
-			return -E_NO_MEM;
+			shm_pool[i].npage = npage;
+			shm_pool[i].open = 1;
+			return i;
 		}
-		// 分配成功
-		// 记录到临时数组
-		pp->pp_ref++;
-		temp_pages[i] = pp;
 	}
-	// 全部分配成功，记录到结构体的数组
-	for (i = 0; i < npage; i++) {
-		shm_pool[index].pages[i] = temp_pages[i];
-	}
-	// 设置结构体信息
-	shm_pool[index].npage = npage;
-	shm_pool[index].open = 1;
 
-	return index;
+	return -E_SHM_INVALID;
 }
 
 int sys_shm_bind(int key, u_int va, u_int perm) {
@@ -66,20 +42,14 @@ int sys_shm_bind(int key, u_int va, u_int perm) {
 	}
 
 	// Lab4-Extra: Your code here. (6/8)
-	
-	// 如果对应的共享内存未被分配（open = 0），则返回 -E_SHM_NOT_OPEN
 	if (shm_pool[key].open == 0) {
 		return -E_SHM_NOT_OPEN;
 	}
-	
-	
-	
-	// 将虚拟地址范围 [va, va + npage * PAGE_SIZE) 依次映射到共享内存的 npage 个物理页面上
-	int i;
+
 	int npage = shm_pool[key].npage;
-	for (i = 0; i < npage; i++) {
-		// 映射va + i * PAGE_SIZE 到 shm_pool[key].pages[i]上
-		page_insert(curenv->env_pgdir, curenv->env_asid, shm_pool[key].pages[i], (va + i * PAGE_SIZE), perm);
+
+	for (int i = 0; i < npage; i++) {
+		page_insert(curenv->env_pgdir, curenv->env_asid, shm_pool[key].pages[i], va + i * PAGE_SIZE, perm);
 	}
 
 	return 0;
@@ -91,19 +61,17 @@ int sys_shm_unbind(int key, u_int va) {
 	}
 
 	// Lab4-Extra: Your code here. (7/8)
-	
-	// 如果 key 对应的共享内存未被分配（open = 0），返回 -E_SHM_NOT_OPEN。
 	if (shm_pool[key].open == 0) {
 		return -E_SHM_NOT_OPEN;
 	}
-	
-	
 
-	// 将虚拟地址范围 [va, va + npage * PAGE_SIZE) 解除映射（va 保证按页对齐）。
-	int i;
-	for (i = 0; i < shm_pool[key].npage; i++) {
-		page_remove(curenv->env_pgdir, curenv->env_asid,  (va + i * PAGE_SIZE));
+	int npage = shm_pool[key].npage;
+
+	for (int i = 0; i < npage; i++) {
+		page_remove(curenv->env_pgdir, curenv->env_asid, va + i * PAGE_SIZE);
+
 	}
+
 
 	return 0;
 }
@@ -117,19 +85,15 @@ int sys_shm_free(int key) {
 	if (shm_pool[key].open == 0) {
 		return -E_SHM_NOT_OPEN;
 	}
-	
-	// 释放结构体内容
-	shm_pool[key].open = 0;
-	int i;
-	for (i = 0; i < shm_pool[key].npage; i++) {
+	for (int i = 0; i < shm_pool[key].npage; i++) {
 		page_decref(shm_pool[key].pages[i]);
 	}
+
+	shm_pool[key].open = 0;
 	shm_pool[key].npage = 0;
 
 	return 0;
 }
-
-// extra结束
 
 
 
@@ -184,9 +148,8 @@ u_int sys_getenvid(void) {
 void __attribute__((noreturn)) sys_yield(void) {
 	// Hint: Just use 'schedule' with 'yield' set.
 	/* Exercise 4.7: Your code here. */
-	
-	// 把yield置位
 	schedule(1);
+
 }
 
 /* Overview:
@@ -223,12 +186,10 @@ int sys_set_tlb_mod_entry(u_int envid, u_int func) {
 
 	/* Step 1: Convert the envid to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.12: Your code here. (1/2) */
-
 	try(envid2env(envid, &env, 1));
 
 	/* Step 2: Set its 'env_user_tlb_mod_entry' to 'func'. */
 	/* Exercise 4.12: Your code here. (2/2) */
-
 	env->env_user_tlb_mod_entry = func;
 
 	return 0;
@@ -270,8 +231,6 @@ int sys_mem_alloc(u_int envid, u_int va, u_int perm) {
 
 	/* Step 1: Check if 'va' is a legal user virtual address using 'is_illegal_va'. */
 	/* Exercise 4.4: Your code here. (1/3) */
-
-	// 检查va是否是合法的用户态虚地址
 	if (is_illegal_va(va)) {
 		return -E_INVAL;
 	}
@@ -279,14 +238,10 @@ int sys_mem_alloc(u_int envid, u_int va, u_int perm) {
 	/* Step 2: Convert the envid to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Hint: **Always** validate the permission in syscalls! */
 	/* Exercise 4.4: Your code here. (2/3) */
-	
-	// 调用envid2env获取envid对应的进程
 	try(envid2env(envid, &env, 1));
 
 	/* Step 3: Allocate a physical page using 'page_alloc'. */
 	/* Exercise 4.4: Your code here. (3/3) */
-
-	// 分配一个物理页
 	try(page_alloc(&pp));
 
 	/* Step 4: Map the allocated page at 'va' with permission 'perm' using 'page_insert'. */
@@ -315,33 +270,24 @@ int sys_mem_map(u_int srcid, u_int srcva, u_int dstid, u_int dstva, u_int perm) 
 	/* Step 1: Check if 'srcva' and 'dstva' are legal user virtual addresses using
 	 * 'is_illegal_va'. */
 	/* Exercise 4.5: Your code here. (1/4) */
-
-	// 检查虚地址是否合法 
 	if (is_illegal_va(srcva) || is_illegal_va(dstva)) {
 		return -E_INVAL;
 	}
 
 	/* Step 2: Convert the 'srcid' to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.5: Your code here. (2/4) */
-	
-	// 获取srcid对应的进程
 	try(envid2env(srcid, &srcenv, 1));
 
 	/* Step 3: Convert the 'dstid' to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.5: Your code here. (3/4) */
-
-	// 获取dstid对应的进程
 	try(envid2env(dstid, &dstenv, 1));
 
 	/* Step 4: Find the physical page mapped at 'srcva' in the address space of 'srcid'. */
 	/* Return -E_INVAL if 'srcva' is not mapped. */
 	/* Exercise 4.5: Your code here. (4/4) */
-
-	// 在srcid的地址空间内找到一个物理页与srcva进行映射
-	// 如果srcva没有映射则报错
 	pp = page_lookup(srcenv->env_pgdir, srcva, NULL);
 	if (pp == NULL) {
-		return -E_INVAL;
+			return -E_INVAL;
 	}
 
 	/* Step 5: Map the physical page at 'dstva' in the address space of 'dstid'. */
@@ -363,16 +309,12 @@ int sys_mem_unmap(u_int envid, u_int va) {
 
 	/* Step 1: Check if 'va' is a legal user virtual address using 'is_illegal_va'. */
 	/* Exercise 4.6: Your code here. (1/2) */
-
-	// 检查虚地址合法性
 	if (is_illegal_va(va)) {
-		return -E_INVAL;
+			return -E_INVAL;
 	}
 
 	/* Step 2: Convert the envid to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.6: Your code here. (2/2) */
-
-	// 获取对应的进程
 	try(envid2env(envid, &e, 1));
 
 	/* Step 3: Unmap the physical page at 'va' in the address space of 'envid'. */
@@ -399,25 +341,18 @@ int sys_exofork(void) {
 
 	/* Step 1: Allocate a new env using 'env_alloc'. */
 	/* Exercise 4.9: Your code here. (1/4) */
-	
-	// 分配一个新进程
 	try(env_alloc(&e, curenv->env_id));
 
 	/* Step 2: Copy the current Trapframe below 'KSTACKTOP' to the new env's 'env_tf'. */
 	/* Exercise 4.9: Your code here. (2/4) */
-	
 	e->env_tf = *((struct Trapframe *)KSTACKTOP - 1);
 
 	/* Step 3: Set the new env's 'env_tf.regs[2]' to 0 to indicate the return value in child. */
 	/* Exercise 4.9: Your code here. (3/4) */
-	
-	// 系统调用在内核态返回的envid 只传递给父进程，对于子进程，则需要将其现场中的 v0 寄存器修改为 0。
 	e->env_tf.regs[2] = 0;
 
 	/* Step 4: Set up the new env's 'env_status' and 'env_pri'.  */
 	/* Exercise 4.9: Your code here. (4/4) */
-	
-	// 设置"不可运行"状态，并字段初始化
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_pri = curenv->env_pri;
 
@@ -441,22 +376,16 @@ int sys_set_env_status(u_int envid, u_int status) {
 
 	/* Step 1: Check if 'status' is valid. */
 	/* Exercise 4.14: Your code here. (1/3) */
-	
-	// 检测合法
 	if (status != ENV_RUNNABLE && status != ENV_NOT_RUNNABLE) {
 		return -E_INVAL;
 	}
 
 	/* Step 2: Convert the envid to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.14: Your code here. (2/3) */
-	
-	// 获取env
 	try(envid2env(envid, &env, 1));
 
 	/* Step 3: Update 'env_sched_list' if the 'env_status' of 'env' is being changed. */
 	/* Exercise 4.14: Your code here. (3/3) */
-	
-	// 更新进程调度队列
 	if (status == ENV_RUNNABLE && env->env_status != ENV_RUNNABLE) {
 		TAILQ_INSERT_TAIL(&env_sched_list, env, env_sched_link);
 	} else if (status == ENV_NOT_RUNNABLE && env->env_status != ENV_NOT_RUNNABLE) {
@@ -526,23 +455,18 @@ int sys_ipc_recv(u_int dstva) {
 
 	/* Step 2: Set 'curenv->env_ipc_recving' to 1. */
 	/* Exercise 4.8: Your code here. (1/8) */
-
-	// 把reciving置为1
 	curenv->env_ipc_recving = 1;
 
 	/* Step 3: Set the value of 'curenv->env_ipc_dstva'. */
 	/* Exercise 4.8: Your code here. (2/8) */
-	
-	// 设置dstva
 	curenv->env_ipc_dstva = dstva;
 
 	/* Step 4: Set the status of 'curenv' to 'ENV_NOT_RUNNABLE' and remove it from
 	 * 'env_sched_list'. */
 	/* Exercise 4.8: Your code here. (3/8) */
-	
-	// 设置当前进程为“不可运行”，并把它移出调度队列
 	curenv->env_status = ENV_NOT_RUNNABLE;
 	TAILQ_REMOVE(&env_sched_list, curenv, env_sched_link);
+
 
 	/* Step 5: Give up the CPU and block until a message is received. */
 	((struct Trapframe *)KSTACKTOP - 1)->regs[2] = 0;
@@ -571,8 +495,6 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 
 	/* Step 1: Check if 'srcva' is either zero or a legal address. */
 	/* Exercise 4.8: Your code here. (4/8) */
-	
-	// 检查srcva非0且合法
 	if (srcva != 0 && is_illegal_va(srcva)) {
 		return -E_INVAL;
 	}
@@ -581,13 +503,10 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 	/* This is the only syscall where the 'envid2env' should be used with 'checkperm' UNSET,
 	 * because the target env is not restricted to 'curenv''s children. */
 	/* Exercise 4.8: Your code here. (5/8) */
-	
-	// 获取env
 	try(envid2env(envid, &e, 0));
 
 	/* Step 3: Check if the target is waiting for a message. */
 	/* Exercise 4.8: Your code here. (6/8) */
-	
 	if (e->env_ipc_recving == 0) {
 		return -E_IPC_NOT_RECV;
 	}
@@ -601,8 +520,6 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 	/* Step 5: Set the target's status to 'ENV_RUNNABLE' again and insert it to the tail of
 	 * 'env_sched_list'. */
 	/* Exercise 4.8: Your code here. (7/8) */
-	
-	// 恢复状态设置
 	e->env_status = ENV_RUNNABLE;
 	TAILQ_INSERT_TAIL(&env_sched_list, e, env_sched_link);
 
@@ -611,14 +528,11 @@ int sys_ipc_try_send(u_int envid, u_int value, u_int srcva, u_int perm) {
 	/* Return -E_INVAL if 'srcva' is not zero and not mapped in 'curenv'. */
 	if (srcva != 0) {
 		/* Exercise 4.8: Your code here. (8/8) */
-		
-		// 找到物理页，尝试insert,建立映射
 		p = page_lookup(curenv->env_pgdir, srcva, NULL);
 		if (p == NULL) {
 			return -E_INVAL;
 		}
 		try(page_insert(e->env_pgdir, e->env_asid, p, e->env_ipc_dstva, perm));
-
 	}
 	return 0;
 }
@@ -708,10 +622,10 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_cgetc] = sys_cgetc,
     [SYS_write_dev] = sys_write_dev,
     [SYS_read_dev] = sys_read_dev,
-    [SYS_shm_new] = sys_shm_new,
-    [SYS_shm_bind] = sys_shm_bind,
-    [SYS_shm_unbind] = sys_shm_unbind,
-    [SYS_shm_free] = sys_shm_free,
+	[SYS_shm_new] = sys_shm_new,
+	[SYS_shm_bind] = sys_shm_bind,
+	[SYS_shm_unbind] = sys_shm_unbind,
+	[SYS_shm_free] = sys_shm_free,
 };
 
 /* Overview:
@@ -734,14 +648,10 @@ void do_syscall(struct Trapframe *tf) {
 
 	/* Step 1: Add the EPC in 'tf' by a word (size of an instruction). */
 	/* Exercise 4.2: Your code here. (1/4) */
-
-	// EPC加上一个指令偏移的地址
 	tf->cp0_epc += 4;
 
 	/* Step 2: Use 'sysno' to get 'func' from 'syscall_table'. */
 	/* Exercise 4.2: Your code here. (2/4) */
-
-	// 用sysno获取func数组中对应的处理函数指针
 	func = syscall_table[sysno];
 
 	/* Step 3: First 3 args are stored in $a1, $a2, $a3. */
@@ -752,20 +662,14 @@ void do_syscall(struct Trapframe *tf) {
 	/* Step 4: Last 2 args are stored in stack at [$sp + 16 bytes], [$sp + 20 bytes]. */
 	u_int arg4, arg5;
 	/* Exercise 4.2: Your code here. (3/4) */
-	
-	// arg4和arg5分别存在栈指针sp加上4x4和4x5个字节处。
-	// 这是由于arg0-4虽然不用栈空间传参，仍然需要为它们预留空间，故arg4-5存在栈空间16-20 bytes处。
-	u_int *p_arg4 = (u_int *)tf->regs[29] + 4;
-	u_int *p_arg5 = (u_int *)tf->regs[29] + 5;
-	arg4 = *p_arg4;
-	arg5 = *p_arg5;
+	u_int *sp = (u_int *)tf->regs[29];
+	arg4 = sp[4];
+	arg5 = sp[5];
 
 	/* Step 5: Invoke 'func' with retrieved arguments and store its return value to $v0 in 'tf'.
 	 */
 	/* Exercise 4.2: Your code here. (4/4) */
-	
-	// 利用arg1-5调用func函数，把返回值存到v0寄存器
-	tf->regs[2] = func(arg1, arg2, arg3, arg4, arg5);
+    tf->regs[2] = func(arg1, arg2, arg3, arg4, arg5);
 
 }
 
