@@ -22,20 +22,14 @@ int sys_shm_new(u_int npage) {
 	for (int i = 0; i < N_SHM; i++) {
 		if (shm_pool[i].open == 0) {
 			index = i;
-			int j = 0;
-			int full = 0;
-			for (; j < npage; j++) {
-				if (page_alloc(&(shm_pool[i].pages[j])) != 0) {
-					full = 1;
-					break;
+			for (int j = 0; j < npage; j++) {
+				if (page_alloc(&(shm_pool[i].pages[j]))) {
+					for (int k = 0; k < j; k++) {
+						page_decref(shm_pool[i].pages[k]);
+					}
+					return -E_NO_MEM;
 				}
 				shm_pool[i].pages[j]->pp_ref++;
-			}
-			if (full) {
-				for (int k = 0; k < j; k++) {
-					page_decref(shm_pool[i].pages[k]);
-				}
-				return -E_NO_MEM;
 			}
 			sign = 1;
 			shm_pool[i].npage = npage;
