@@ -26,10 +26,10 @@ int sys_shm_new(u_int npage) {
 			int full = 0;
 			for (; j < npage; j++) {
 				if (page_alloc(&(shm_pool[i].pages[j])) != 0) {
-					shm_pool[i].pages[j]->pp_ref++;
 					full = 1;
 					break;
 				}
+				shm_pool[i].pages[j]->pp_ref++;
 			}
 			if (full) {
 				for (int k = 0; k < j; k++) {
