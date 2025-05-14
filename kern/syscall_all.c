@@ -32,7 +32,7 @@ int sys_shm_new(u_int npage) {
 			}
 			if (full) {
 				for (int k = 0; k < j; k++) {
-					page_free(&(shm_pool[i].pages[k]));
+					page_free(shm_pool[i].pages[k]);
 				}
 				return -E_NO_MEM;
 			}
@@ -60,10 +60,10 @@ int sys_shm_bind(int key, u_int va, u_int perm) {
 		return -E_SHM_NOT_OPEN;
 	}
 
-	int npage = shm_pool[key].napge;
+	int npage = shm_pool[key].npage;
 
 	for (int i = 0; i < npage; i++) {
-		
+		page_insert(curenv->env_pgdir, curenv->env_asid, shm_pool[key].pages[i], va + i * PAGE_SIZE, perm);
 	}
 
 	return 0;
@@ -75,6 +75,16 @@ int sys_shm_unbind(int key, u_int va) {
 	}
 
 	// Lab4-Extra: Your code here. (7/8)
+	if (shm_pool[key].open == 0) {
+		return -E_SHM_NOT_OPEN;
+	}
+
+	int npage = shm_pool[key].npage;
+
+	for (int i = 0; i < npage; i++) {
+		page_remove(curenv->env_pgdir, curenv->env_asid, va + i * PAGE_SIZE);
+	}
+
 
 	return 0;
 }
@@ -89,7 +99,7 @@ int sys_shm_free(int key) {
 		return -E_SHM_NOT_OPEN;
 	}
 	for (int i = 0; i < shm_pool[key].npage; i++) {
-		page_free(&(shm_pool[key].pages[i]));
+		page_free(shm_pool[key].pages[i]);
 	}
 
 	shm_pool[key].open = 0;
