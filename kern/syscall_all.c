@@ -10,30 +10,65 @@
 extern struct Env *curenv;
 struct Shm shm_pool[N_SHM];
 
+//int sys_shm_new(u_int npage) {
+//	if (npage == 0 || npage > N_SHM_PAGE) {
+//		return -E_SHM_INVALID;
+//	}
+//
+//	// Lab4-Extra: Your code here. (5/8)
+//	for (int i = 0; i < N_SHM; i++) {
+//		if (shm_pool[i].open == 0) {
+//			for (int j = 0; j < npage; j++) {
+//				if (page_alloc(&(shm_pool[i].pages[j]))) {
+//					for (int k = 0; k < j; k++) {
+//						page_decref(shm_pool[i].pages[k]);
+//					}
+//					return -E_NO_MEM;
+//				}
+//				shm_pool[i].pages[j]->pp_ref++;
+//			}
+//			shm_pool[i].npage = npage;
+//			shm_pool[i].open = 1;
+//			return i;
+//		}
+//	}
+//
+//	return -E_SHM_INVALID;
+//}
 int sys_shm_new(u_int npage) {
 	if (npage == 0 || npage > N_SHM_PAGE) {
 		return -E_SHM_INVALID;
 	}
 
 	// Lab4-Extra: Your code here. (5/8)
-	for (int i = 0; i < N_SHM; i++) {
-		if (shm_pool[i].open == 0) {
-			for (int j = 0; j < npage; j++) {
-				if (page_alloc(&(shm_pool[i].pages[j]))) {
-					for (int k = 0; k < j; k++) {
-						page_decref(shm_pool[i].pages[k]);
-					}
-					return -E_NO_MEM;
-				}
-				shm_pool[i].pages[j]->pp_ref++;
-			}
-			shm_pool[i].npage = npage;
-			shm_pool[i].open = 1;
-			return i;
+	int index;
+	for (index = 0; index < N_SHM; index++) {
+		if (shm_pool[index].open == 0) {
+			break; 
 		}
 	}
+	if (index == N_SHM) {
+		return -E_SHM_INVALID; 
+	}
+	struct Page *pp = NULL;
+	struct Page *temp_pages[N_SHM_PAGE];
+	for (int i = 0; i < npage; i++) {
+		if (page_alloc(&pp) == -E_NO_MEM) {
+			for (int j = 0; j < i; j++) {
+				page_decref(temp_pages[j]);
+			}
+			return -E_NO_MEM;
+		}
+		pp->pp_ref++;
+		temp_pages[i] = pp;
+	}
+	for (int i = 0; i < npage; i++) {
+		shm_pool[index].pages[i] = temp_pages[i];
+	}
+	shm_pool[index].npage = npage;
+	shm_pool[index].open = 1;
 
-	return -E_SHM_INVALID;
+	return index;
 }
 
 int sys_shm_bind(int key, u_int va, u_int perm) {
