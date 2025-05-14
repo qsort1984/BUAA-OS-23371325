@@ -8,6 +8,27 @@ void syscall_putchar(int ch) {
 	msyscall(SYS_putchar, ch);
 }
 
+int syscall_shm_new(u_int npage) {
+	// Lab4-Extra: Your code here. (1/8)
+	return msyscall(SYS_shm_new, npage);
+}
+
+int syscall_shm_bind(int key, u_int va, u_int perm) {
+	// Lab4-Extra: Your code here. (2/8)
+	return msyscall(SYS_shm_bind, key, va, perm);
+}
+
+int syscall_shm_unbind(int key, u_int va) {
+	// Lab4-Extra: Your code here. (3/8)
+	return msyscall(SYS_shm_unbind, key, va);
+}
+
+int syscall_shm_free(int key) {
+	// Lab4-Extra: Your code here. (4/8)
+	return msyscall(SYS_shm_free, key);
+}
+
+
 int syscall_print_cons(const void *str, u_int num) {
 	return msyscall(SYS_print_cons, str, num);
 }

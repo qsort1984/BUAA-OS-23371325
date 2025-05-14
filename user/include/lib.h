@@ -119,6 +119,18 @@ int remove(const char *path);
 int ftruncate(int fd, u_int size);
 int sync(void);
 
+// syscalls
+int syscall_shm_new(u_int npage);
+int syscall_shm_bind(int key, u_int va, u_int perm);
+int syscall_shm_unbind(int key, u_int va);
+int syscall_shm_free(int key);
+
+// shm.c
+int shm_new(u_int npage);
+int shm_bind(u_int key, void *va);
+int shm_unbind(u_int key, void *va);
+int shm_free(u_int key);
+
 #define user_assert(x)                                                                             \
 	do {                                                                                       \
 		if (!(x))                                                                          \
