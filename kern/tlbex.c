@@ -55,11 +55,11 @@ void _do_tlb_refill(u_long *pentrylo, u_int va, u_int asid) {
 	 *  **While** 'page_lookup' returns 'NULL', indicating that the '*ppte' could not be found,
 	 *  allocate a new page using 'passive_alloc' until 'page_lookup' succeeds.
 	 */
+
+	/* Exercise 2.9: Your code here. */
 	while (page_lookup(cur_pgdir, va, &ppte) == NULL) {
 		passive_alloc(va, cur_pgdir, asid);
 	}
-
-	/* Exercise 2.9: Your code here. */
 
 	ppte = (Pte *)((u_long)ppte & ~0x7);
 	pentrylo[0] = ppte[0] >> 6;
@@ -94,7 +94,6 @@ void do_tlb_mod(struct Trapframe *tf) {
 		// Hint: Set 'cp0_epc' in the context 'tf' to 'curenv->env_user_tlb_mod_entry'.
 		/* Exercise 4.11: Your code here. */
 		tf->cp0_epc = curenv->env_user_tlb_mod_entry;
-
 	} else {
 		panic("TLB Mod but no user handler registered");
 	}
