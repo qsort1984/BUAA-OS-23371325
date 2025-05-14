@@ -16,12 +16,8 @@ int sys_shm_new(u_int npage) {
 	}
 
 	// Lab4-Extra: Your code here. (5/8)
-	int sign = 0;
-	int index = 0;
-	
 	for (int i = 0; i < N_SHM; i++) {
 		if (shm_pool[i].open == 0) {
-			index = i;
 			for (int j = 0; j < npage; j++) {
 				if (page_alloc(&(shm_pool[i].pages[j]))) {
 					for (int k = 0; k < j; k++) {
@@ -34,15 +30,11 @@ int sys_shm_new(u_int npage) {
 			sign = 1;
 			shm_pool[i].npage = npage;
 			shm_pool[i].open = 1;
-			break;
+			return i;
 		}
 	}
 
-	if (sign == 0) {
-		return -E_SHM_INVALID;
-	}
-
-	return index;
+	return -E_SHM_INVALID;
 }
 
 int sys_shm_bind(int key, u_int va, u_int perm) {
