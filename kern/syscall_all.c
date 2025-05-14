@@ -26,13 +26,14 @@ int sys_shm_new(u_int npage) {
 			int full = 0;
 			for (; j < npage; j++) {
 				if (page_alloc(&(shm_pool[i].pages[j])) != 0) {
+					shm_pool[i].pages[j]->pp_ref++;
 					full = 1;
 					break;
 				}
 			}
 			if (full) {
 				for (int k = 0; k < j; k++) {
-					page_free(shm_pool[i].pages[k]);
+					page_decref(shm_pool[i].pages[k]);
 				}
 				return -E_NO_MEM;
 			}
@@ -83,6 +84,7 @@ int sys_shm_unbind(int key, u_int va) {
 
 	for (int i = 0; i < npage; i++) {
 		page_remove(curenv->env_pgdir, curenv->env_asid, va + i * PAGE_SIZE);
+
 	}
 
 
@@ -99,7 +101,7 @@ int sys_shm_free(int key) {
 		return -E_SHM_NOT_OPEN;
 	}
 	for (int i = 0; i < shm_pool[key].npage; i++) {
-		page_free(shm_pool[key].pages[i]);
+		page_decref(shm_pool[key].pages[i]);
 	}
 
 	shm_pool[key].open = 0;
