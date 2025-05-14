@@ -90,6 +90,7 @@ int sys_shm_free(int key) {
 	}
 
 	shm_pool[key].open = 0;
+	shm_pool[key].npage = 0;
 
 	return 0;
 }
