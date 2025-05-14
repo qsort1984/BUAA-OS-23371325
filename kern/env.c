@@ -74,8 +74,7 @@ static void map_segment(Pde *pgdir, u_int asid, u_long pa, u_long va, u_int size
 		 *  Use 'pa2page' to get the 'struct Page *' of the physical address.
 		 */
 		/* Exercise 3.2: Your code here. */
-		struct Page *pp = pa2page(pa + i);
-		panic_on(page_insert(pgdir, asid, pp, va + i, perm));
+		panic_on(page_insert(pgdir, asid, pa2page(pa + i), va + i, perm));
 	}
 }
 
@@ -119,9 +118,7 @@ int envid2env(u_int envid, struct Env **penv, int checkperm) {
 		*penv = curenv;
 		return 0;
 	}
-
 	e = &envs[ENVX(envid)];
-
 
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		return -E_BAD_ENV;
@@ -155,18 +152,20 @@ void env_init(void) {
 	/* Step 1: Initialize 'env_free_list' with 'LIST_INIT' and 'env_sched_list' with
 	 * 'TAILQ_INIT'. */
 	/* Exercise 3.1: Your code here. (1/2) */
-	LIST_INIT(&env_free_list);
+
+	LIST_INIT((&env_free_list));
 	TAILQ_INIT(&env_sched_list);
 
 	/* Step 2: Traverse the elements of 'envs' array, set their status to 'ENV_FREE' and insert
 	 * them into the 'env_free_list'. Make sure, after the insertion, the order of envs in the
 	 * list should be the same as they are in the 'envs' array. */
-	for (i = NENV - 1; i >= 0; i--) {
-			envs[i].env_status = ENV_FREE;
-			LIST_INSERT_HEAD(&env_free_list, &envs[i], env_link);
-	}
 
 	/* Exercise 3.1: Your code here. (2/2) */
+
+	for (i = NENV - 1; i >= 0; --i) {
+		envs[i].env_status = ENV_FREE;
+		LIST_INSERT_HEAD(&env_free_list, &envs[i], env_link);
+	}
 
 	/*
 	 * We want to map 'UPAGES' and 'UENVS' to *every* user space with PTE_G permission (without
@@ -201,6 +200,7 @@ static int env_setup_vm(struct Env *e) {
 	struct Page *p;
 	try(page_alloc(&p));
 	/* Exercise 3.3: Your code here. */
+
 	p->pp_ref++;
 	e->env_pgdir = (Pde *)page2kva(p);
 
@@ -243,14 +243,18 @@ int env_alloc(struct Env **new, u_int parent_id) {
 
 	/* Step 1: Get a free Env from 'env_free_list' */
 	/* Exercise 3.4: Your code here. (1/4) */
-	if (LIST_EMPTY(&env_free_list)) {
+
+	e = LIST_FIRST(&env_free_list);
+	if (e == NULL) {
 		return -E_NO_FREE_ENV;
 	}
-	e = LIST_FIRST(&env_free_list);
 
 	/* Step 2: Call a 'env_setup_vm' to initialize the user address space for this new Env. */
 	/* Exercise 3.4: Your code here. (2/4) */
-	try(env_setup_vm(e));
+
+	if ((r = env_setup_vm(e)) != 0) {
+		return r;
+	}
 
 	/* Step 3: Initialize these fields for the new Env with appropriate values:
 	 *   'env_user_tlb_mod_entry' (lab4), 'env_runs' (lab6), 'env_id' (lab3), 'env_asid' (lab3),
@@ -262,10 +266,12 @@ int env_alloc(struct Env **new, u_int parent_id) {
 	 */
 	e->env_user_tlb_mod_entry = 0; // for lab4
 	e->env_runs = 0;	       // for lab6
-	try(asid_alloc(&e->env_asid));
+	/* Exercise 3.4: Your code here. (3/4) */
+	if ((r = asid_alloc(&e->env_asid)) != 0) {
+		return r;
+	}
 	e->env_id = mkenvid(e);
 	e->env_parent_id = parent_id;
-	/* Exercise 3.4: Your code here. (3/4) */
 
 	/* Step 4: Initialize the sp and 'cp0_status' in 'e->env_tf'.
 	 *   Set the EXL bit to ensure that the processor remains in kernel mode during context
@@ -278,6 +284,7 @@ int env_alloc(struct Env **new, u_int parent_id) {
 
 	/* Step 5: Remove the new Env from env_free_list. */
 	/* Exercise 3.4: Your code here. (4/4) */
+
 	LIST_REMOVE(e, env_link);
 
 	*new = e;
@@ -309,14 +316,18 @@ static int load_icode_mapper(void *data, u_long va, size_t offset, u_int perm, c
 
 	/* Step 1: Allocate a page with 'page_alloc'. */
 	/* Exercise 3.5: Your code here. (1/2) */
-	try(page_alloc(&p));
+
+	if ((r = page_alloc(&p)) != 0) {
+		return r;
+	}
 
 	/* Step 2: If 'src' is not NULL, copy the 'len' bytes started at 'src' into 'offset' at this
 	 * page. */
 	// Hint: You may want to use 'memcpy'.
 	if (src != NULL) {
 		/* Exercise 3.5: Your code here. (2/2) */
-		memcpy((char *)page2kva(p) + offset, src, len);
+
+		memcpy((void *)page2kva(p) + offset, src, len);
 	}
 
 	/* Step 3: Insert 'p' into 'env->env_pgdir' at 'va' with 'perm'. */
@@ -377,6 +388,7 @@ struct Env *env_create(const void *binary, size_t size, int priority) {
 	/* Step 3: Use 'load_icode' to load the image from 'binary', and insert 'e' into
 	 * 'env_sched_list' using 'TAILQ_INSERT_HEAD'. */
 	/* Exercise 3.7: Your code here. (3/3) */
+
 	load_icode(e, binary, size);
 	TAILQ_INSERT_HEAD(&env_sched_list, e, env_sched_link);
 
@@ -482,6 +494,7 @@ void env_run(struct Env *e) {
 
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
+
 	cur_pgdir = curenv->env_pgdir;
 
 	/* Step 4: Use 'env_pop_tf' to restore the curenv's saved context (registers) and return/go
@@ -494,7 +507,6 @@ void env_run(struct Env *e) {
 	 */
 	/* Exercise 3.8: Your code here. (2/2) */
 	env_pop_tf(&curenv->env_tf, curenv->env_asid);
-
 }
 
 void env_check() {
