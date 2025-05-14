@@ -27,7 +27,6 @@ int sys_shm_new(u_int npage) {
 				}
 				shm_pool[i].pages[j]->pp_ref++;
 			}
-			sign = 1;
 			shm_pool[i].npage = npage;
 			shm_pool[i].open = 1;
 			return i;
