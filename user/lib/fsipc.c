@@ -77,6 +77,27 @@ int fsipc_map(u_int fileid, u_int offset, void *dstva) {
 	return 0;
 }
 
+int fsipc_key_set(u_int fileid) {
+  // 合理调用 fsipc 函数
+	struct Fsreq_key_set *req;
+
+	req = (struct Fsreq_key_set *)fsipcbuf;
+	req->req_fileid = fileid;
+	return fsipc(FSREQ_KEY_SET, req, 0, 0);
+
+}
+
+int fsipc_key_unset(void) {
+  // 合理调用 fsipc 函数
+	return fsipc(FSREQ_KEY_UNSET, fsipcbuf, 0, 0);
+}
+
+int fsipc_key_isset(void) {
+  // 合理调用 fsipc 函数
+	return fsipc(FSREQ_KEY_ISSET, fsipcbuf, 0, 0);
+
+}
+
 // Overview:
 //  Make a set-file-size request to the file server.
 int fsipc_set_size(u_int fileid, u_int size) {
