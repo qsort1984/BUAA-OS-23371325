@@ -274,23 +274,24 @@ void serve_open(u_int envid, struct Fsreq_open *rq) {
 void serve_map(u_int envid, struct Fsreq_map *rq) {
 	struct Open *pOpen;
 	u_int filebno;
-	void *blk;
+	unsigned char *blk;
 	int r;
 
 	if ((r = open_lookup(envid, rq->req_fileid, &pOpen)) < 0) {
 		ipc_send(envid, r, 0, 0);
 		return;
 	}
-	if (pOpen->o_mode == O_ENCRYPT) {
+	if (pOpen->o_mode & O_ENCRYPT) {
 		if (encrypt_key_set == 0) {
-				return -E_BAD_KEY;
+			ipc_send(envid, -E_BAD_KEY, 0, 0);
+			return;
 		}
 	}	
 
 	filebno = rq->req_offset / BLOCK_SIZE;
 
 	if ((r = file_get_block(pOpen->o_file, filebno, &blk)) < 0) {
-		if (pOpen->o_mode == O_ENCRYPT) {
+		if (pOpen->o_mode & O_ENCRYPT) {
 			for (int i = 0; i < BLOCK_SIZE; i++) {
 				 blk[i] ^= encrypt_key[i];
 			}
@@ -352,6 +353,26 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 		return;
 	}
 
+	if (pOpen->o_mode & O_ENCRYPT) {
+		if (encrypt_key_set == 0) {
+				return -E_BAD_KEY;
+		} else {
+		struct File *f = pOpen->o_file;
+		u_int nblocks = ROUND(f->f_size, BLOCK_SIZE) / BLOCK_SIZE;
+		unsigned char *blk;
+
+		for (int bno = 0; bno < nblocks; bno++) {
+			if ((r = file_get_block(f, bno, &blk)) < 0) {
+				ipc_send(envid, r, 0, 0);
+				return;
+			}
+			for (int i = 0; i < BLOCK_SIZE; i++) {
+				blk[i] ^= encrypt_key[i];
+			}
+		}
+
+		}
+	}
 	
 
 	file_close(pOpen->o_file);

@@ -142,7 +142,7 @@ int fskey_set(int fdnum) {
 
   // 判断文件是否以加密方式打开，判断打开方式是否为只写
   // 密钥文件要求以非加密且允许读的方式打开，不满足则返回 -E_INVAL
-  if (fd->fd_omode == O_ENCRYPT || fd->fd_omode == O_WRONLY) {
+  if (fd->fd_omode & O_ENCRYPT || fd->fd_omode & O_WRONLY) {
 		  return -E_INVAL;
   }
 
