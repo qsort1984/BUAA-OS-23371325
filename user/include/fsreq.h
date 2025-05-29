@@ -45,4 +45,9 @@ struct Fsreq_remove {
 	char req_path[MAXPATHLEN];
 };
 
+struct Fsreq_find {
+    	char req_path[MAXPATHLEN];
+    	char req_name[MAXNAMELEN];
+};
+
 #endif
