@@ -355,7 +355,8 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 
 	if (pOpen->o_mode & O_ENCRYPT) {
 		if (encrypt_key_set == 0) {
-				return -E_BAD_KEY;
+				ipc_send(envid, -E_BAD_KEY, 0, 0);
+				return;
 		} else {
 		struct File *f = pOpen->o_file;
 		u_int nblocks = ROUND(f->f_size, BLOCK_SIZE) / BLOCK_SIZE;
