@@ -15,6 +15,14 @@ enum {
 	FSREQ_REMOVE,
 	FSREQ_SYNC,
 	MAX_FSREQNO,
+	FSREQ_KEY_SET,
+	FSREQ_KEY_UNSET,
+	FSREQ_KEY_ISSET,
+	MAX_FSREQNO,
+};
+
+struct Fsreq_key_set {
+  int req_fileid;
 };
 
 struct Fsreq_open {
