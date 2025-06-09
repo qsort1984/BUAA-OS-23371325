@@ -369,7 +369,7 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 					return;
 				}
 				for (int i = 0; i < BLOCK_SIZE; i++) {
-					blk[i] ^= encrypt_key[i];
+					//blk[i] ^= encrypt_key[i];
 				}
 			}
 		}
