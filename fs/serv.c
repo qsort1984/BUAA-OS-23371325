@@ -362,6 +362,7 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 			struct File *f = pOpen->o_file;
 			u_int nblocks = ROUND(f->f_size, BLOCK_SIZE) / BLOCK_SIZE;
 			unsigned char *blk;
+			u_int diskbno;
 			
 			for (int bno = 0; bno < nblocks; bno++) {
 				if ((r = file_get_block(f, bno, &blk)) < 0) {
@@ -371,12 +372,11 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 				for (int i = 0; i < BLOCK_SIZE; i++) {
 					blk[i] ^= encrypt_key[i];
 				}
-				//if ((r = file_map_block(f, bno, &diskbno, 0)) < 0) {
-				//	continue;
-				//}
-				//write_block(diskbno);
+				if ((r = file_map_block(f, bno, &diskbno, 0)) < 0) {
+					continue;
+				}
+				write_block(diskbno);
 			}
-			write_block(nblocks);
 		}
 	}
 
