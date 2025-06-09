@@ -62,15 +62,15 @@ static int encrypt_key_set = 0;
 static unsigned char encrypt_key[BLOCK_SIZE];
 
 void serve_key_set(u_int envid, struct Fsreq_key_set *rq) {
-  // 判断当前状态是否已加载密钥，如果已加载密钥， IPC 返回 -E_BAD_KEY
-  if (encrypt_key_set) {
+	// 判断当前状态是否已加载密钥，如果已加载密钥， IPC 返回 -E_BAD_KEY
+	if (encrypt_key_set) {
 		  ipc_send(envid, -E_BAD_KEY, 0, 0);
 		  return;
-  }
+	}
 
-  // 利用 open_lookup 找到对应的 Open 结构体，判断文件大小是否至少有两个磁盘块大小
-  // 利用 file_get_block 读取文件的第一个磁盘块，判断第一个字是否为 FS_MAGIC
-  // 如果密钥文件不合法， IPC 返回 -E_INVALID_KEY_FILE
+	// 利用 open_lookup 找到对应的 Open 结构体，判断文件大小是否至少有两个磁盘块大小
+	// 利用 file_get_block 读取文件的第一个磁盘块，判断第一个字是否为 FS_MAGIC
+	// 如果密钥文件不合法， IPC 返回 -E_INVALID_KEY_FILE
 	struct Open *pOpen;
 	int r;
 
@@ -99,11 +99,7 @@ void serve_key_set(u_int envid, struct Fsreq_key_set *rq) {
 		return;
 	}
 
-	struct File *files = (struct File *)blk;
-  
-	for (struct File *f = files; f < files + FILE2BLK; ++f) {
-		  // todo
-	}
+	memcpy((void *) encrypt_key, blk, BLOCK_SIZE);
 
 	// 将当前状态标记为已加载密钥
 	encrypt_key_set = 1;
@@ -279,7 +275,7 @@ void serve_open(u_int envid, struct Fsreq_open *rq) {
 void serve_map(u_int envid, struct Fsreq_map *rq) {
 	struct Open *pOpen;
 	u_int filebno;
-	void *blk;
+	unsigned char *blk;
 	int r;
 
 	if ((r = open_lookup(envid, rq->req_fileid, &pOpen)) < 0) {
