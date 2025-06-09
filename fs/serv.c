@@ -297,8 +297,10 @@ void serve_map(u_int envid, struct Fsreq_map *rq) {
 		return;
 	}
 
-	for (int i = 0; i < BLOCK_SIZE; i++) {
-		blk[i] ^= encrypt_key[i];
+	if (pOpen->o_mode & O_ENCRYPT) {
+		for (int i = 0; i < BLOCK_SIZE; i++) {
+			blk[i] ^= encrypt_key[i];
+		}
 	}
 
 	ipc_send(envid, 0, blk, PTE_D | PTE_LIBRARY);
@@ -369,8 +371,7 @@ void serve_close(u_int envid, struct Fsreq_close *rq) {
 					return;
 				}
 				for (int i = 0; i < BLOCK_SIZE; i++) {
-					if (i < 10) debugf("blk[%d] is %02x\n", i, blk[i]);
-					//blk[i] ^= encrypt_key[i];
+					blk[i] ^= encrypt_key[i];
 				}
 			}
 		}
