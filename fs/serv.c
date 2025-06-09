@@ -93,19 +93,23 @@ void serve_key_set(u_int envid, struct Fsreq_key_set *rq) {
 			return;
 	}
 
-  // 利用 file_get_block 读取文件的第二个磁盘块，将密钥复制到 encrypt_key 中
-  if ((r = file_get_block(pOpen->o_file, 1, &blk)) < 0) {
+	 // 利用 file_get_block 读取文件的第二个磁盘块，将密钥复制到 encrypt_key 中
+	if ((r = file_get_block(pOpen->o_file, 1, &blk)) < 0) {
 		ipc_send(envid, r, 0, 0);
 		return;
 	}
 
-  memcpy((void *) encrypt_key, blk, BLOCK_SIZE);
+	struct File *files = (struct File *)blk;
+  
+	for (struct File *f = files; f < files + FILE2BLK; ++f) {
+		  // todo
+	}
 
-  // 将当前状态标记为已加载密钥
-  encrypt_key_set = 1;
+	// 将当前状态标记为已加载密钥
+	encrypt_key_set = 1;
 
-  // IPC 返回 0
-  ipc_send(envid, 0, 0, 0);
+	// IPC 返回 0
+	ipc_send(envid, 0, 0, 0);
 }
 
 void serve_key_unset(u_int envid) {
