@@ -122,21 +122,12 @@ int format_abspath(char *buf, char *path) {
 }
 
 int chdir(const char *path) {
+	printf("path in chdir is %s", path);
 	char abspath[MAXPATHLEN];
 	rel2abs(abspath, path);
+	printf("path in abspath is %s", abspath);
 	
-	struct Stat st;
-
-    if (stat(path, &st) < 0) {
-		return -E_NOT_FOUND;
-	}
-    if (!st.st_isdir) {
-		return -E_NOT_DIR;
-	}
-
-	char formatedpath[MAXPATHLEN];
-	format_abspath(formatedpath, abspath);
-	panic_on(syscall_chdir(formatedpath));
+	panic_on(syscall_chdir(abspath));
 	
 	return 0;
 }
