@@ -185,6 +185,13 @@ void runcmd(char *s) {
 	}
 	argv[argc] = 0;
 
+	// 处理内建指令
+	if (strcmp(argv[0], "cd")) {
+		// todo
+	} else if (strcmp(argv[0], "pwd")) {
+		// todo
+	}
+
 	int child = spawn(argv[0], argv);
 	close_all();
 	if (child >= 0) {
