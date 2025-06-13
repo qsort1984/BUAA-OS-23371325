@@ -29,11 +29,7 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        // cd <abspath>
-        // todo
-
-        // cd <relpath>
-        // todo
+        try(chdir(path));
 
         return 0;
     } else {
