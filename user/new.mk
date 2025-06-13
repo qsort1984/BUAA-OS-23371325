@@ -3,4 +3,5 @@ INITAPPS +=
 
 USERLIB	+=
 
-USERAPPS +=
+USERAPPS += cd.b \
+			pwd.b
