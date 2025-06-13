@@ -41,7 +41,7 @@ struct Env {
 	u_int env_runs; // number of times we've been env_run'ed
 
 	// Lab 6-shell
-	char env_cwd[MAXPATHLEN];
+	char env_cwd[1024]; // MAXPATHLEN = 1024
 };
 
 LIST_HEAD(Env_list, Env);
