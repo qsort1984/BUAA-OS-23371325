@@ -7,7 +7,7 @@ void usage(void) {
 
 int rm(char *path, int mode) {
     struct Stat st;
-    if (stat(argv[1], &st) < 0) {
+    if (stat(path, &st) < 0) {
         if (mode) {
             printf("rm: cannot remove '%s': No such file or directory", argv[1]);
             return -1;
@@ -16,7 +16,7 @@ int rm(char *path, int mode) {
         }
     }
 
-    try(remove(argv[1]));
+    try(remove(path));
 
     return 0;
 }
