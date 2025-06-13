@@ -265,6 +265,7 @@ int env_alloc(struct Env **new, u_int parent_id) {
 	e->env_id = mkenvid(e);
 	try(asid_alloc(&e->env_asid));
 	e->env_parent_id = parent_id;
+	strcpy(e->env_cwd, "/"); // for lab6-shell
 	/* Exercise 3.4: Your code here. (3/4) */
 
 	/* Step 4: Initialize the sp and 'cp0_status' in 'e->env_tf'.

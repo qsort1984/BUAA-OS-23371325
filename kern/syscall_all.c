@@ -556,6 +556,41 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 	return 0;
 }
 
+
+// for lab6-shell to change directory
+int sys_chdir(const char *path) {
+    // char abs[MAXPATHLEN];
+    // struct Stat st;
+
+    // todo
+	// 将 path 解析为绝对路径
+    // if (path[0] == '/') {
+    //     strcpy(abs, path);
+    // } else {
+    //     snprintf(abs, MAXPATHLEN, "%s/%s", curenv->env_cwd, path);
+    // }
+    // normalize_path(abs);  // 解析 "..", ".", 多个 "/"
+
+    // if (stat(abs, &st) < 0) {
+	// 	return -E_NOT_FOUND;
+	// }
+    // if (!st.st_isdir) {
+	// 	return -E_NOT_DIR;
+	// }
+
+    // strcpy(curenv->env_cwd, abs);
+	strcpy(curenv->env_cwd, path);
+    return 0;
+}
+
+int sys_getcwd(char *buf) {
+	if (!buf) {
+		return -E_INVAL;
+	}
+	strcpy(buf, curenv->env_cwd);
+	return 0;
+}
+
 void *syscall_table[MAX_SYSNO] = {
     [SYS_putchar] = sys_putchar,
     [SYS_print_cons] = sys_print_cons,
@@ -575,6 +610,8 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_cgetc] = sys_cgetc,
     [SYS_write_dev] = sys_write_dev,
     [SYS_read_dev] = sys_read_dev,
+	[SYS_chdir] = sys_chdir,
+	[SYS_getcwd] = sys_getcwd,
 };
 
 /* Overview:
