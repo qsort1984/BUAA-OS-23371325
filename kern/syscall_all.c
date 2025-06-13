@@ -560,7 +560,7 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 // for lab6-shell to change directory
 int sys_chdir(const char *path) {
 	// strcpy(curenv->env_cwd, path);
-	printf("can you see me?\n");
+	printk("can you see me?\n");
 	strcpy(curenv->env_cwd, "omg");
     return 0;
 }
