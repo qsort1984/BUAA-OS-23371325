@@ -13,11 +13,11 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[1], "-p") == 0) {
         // 当使用 -p 选项时忽略错误，若目录已存在则直接退出，若创建目录的父目录不存在则递归创建目录。
-        if (stat(argv[1], &st) >= 0) {
+        if (stat(argv[2], &st) >= 0) {
 			return 0;
 		}
 		char temp[MAXPATHLEN];
-        char *p = path;
+        char *p = argv[2];
         char *q = temp;
         while (*p) {
             *q++ = *p++;
