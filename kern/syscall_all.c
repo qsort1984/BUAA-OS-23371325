@@ -562,6 +562,7 @@ int sys_chdir(const char *path) {
 	// strcpy(curenv->env_cwd, path);
 	printk("can you see me?\n");
 	strcpy(curenv->env_cwd, "omg");
+	printk("id is %d and cwd is %s\n", curenv->env_id, curenv->env_cwd);
     return 0;
 }
 
@@ -569,6 +570,7 @@ int sys_getcwd(char *buf) {
 	if (!buf) {
 		return -E_INVAL;
 	}
+	printk("id is %d and cwd is %s\n", curenv->env_id, curenv->env_cwd);
 	strcpy(buf, curenv->env_cwd);
 	return 0;
 }
