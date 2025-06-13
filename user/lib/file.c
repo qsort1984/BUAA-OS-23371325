@@ -38,6 +38,7 @@ int open(const char *path, int mode) {
 	/* Exercise 5.9: Your code here. (2/5) */
 	char abspath[MAXPATHLEN];
 	rel2abs(abspath, path);
+	print("abspath in open is %s\n", abspath);
 	try(fsipc_open(abspath, mode, fd));
 
 	// Step 3: Set 'va' to the address of the page where the 'fd''s data is cached, using
