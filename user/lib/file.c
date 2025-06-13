@@ -361,6 +361,9 @@ int ftruncate(int fdnum, u_int size) {
 int remove(const char *path) {
 	// Call fsipc_remove.
 
+	char abspath[MAXPATHLEN];
+	rel2abs(abspath, path);
+
 	/* Exercise 5.13: Your code here. */
 	return fsipc_remove(path);
 }
