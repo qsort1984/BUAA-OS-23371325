@@ -122,6 +122,7 @@ int ftruncate(int fd, u_int size);
 int sync(void);
 int mkdir(const char *path);
 int chdir(const char *path);
+int rel2abs(char *abspath, const char *path);
 int getcwd(char *buf);
 
 #define user_assert(x)                                                                             \
