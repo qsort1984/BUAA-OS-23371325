@@ -1,6 +1,6 @@
 #include <lib.h>
 
-int main() {
+int main(int argc, char **argv) {
 	if (argc == 1) {
 		char path[MAXPATHLEN];
 		getcwd(path);
