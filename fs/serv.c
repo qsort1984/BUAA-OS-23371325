@@ -152,8 +152,8 @@ void serve_open(u_int envid, struct Fsreq_open *rq) {
 		return;
 	}
 
-	if ((rq->req_omode & O_CREAT) && (r = file_create(rq->req_path, &f)) < 0 &&
-	    r != -E_FILE_EXISTS) {
+	if ((rq->req_omode & O_CREAT || rq->req_omode & O_MKDIR) && 
+		(r = file_create(rq->req_path, &f)) < 0 && r != -E_FILE_EXISTS) {
 		ipc_send(envid, r, 0, 0);
 		return;
 	}
@@ -172,6 +172,11 @@ void serve_open(u_int envid, struct Fsreq_open *rq) {
 		if ((r = file_set_size(f, 0)) < 0) {
 			ipc_send(envid, r, 0, 0);
 		}
+	}
+
+	// If mode include O_MKDIR, set the file type to FTYPE_DIR
+	if (rq->req_omode & O_MKDIR) {
+		f->f_type = FTYPE_DIR;
 	}
 
 	// Fill out the Filefd structure
