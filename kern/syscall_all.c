@@ -266,6 +266,7 @@ int sys_exofork(void) {
 	/* Exercise 4.9: Your code here. (4/4) */
 	e->env_status = ENV_NOT_RUNNABLE;
 	e->env_pri = curenv->env_pri;
+	strcpy(e->env_cwd, curenv->env_cwd);
 
 	return e->env_id;
 }
@@ -559,10 +560,7 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 
 // for lab6-shell to change directory
 int sys_chdir(const char *path) {
-	// strcpy(curenv->env_cwd, path);
-	printk("can you see me?\n");
-	strcpy(curenv->env_cwd, "omg");
-	printk("id is %d and cwd is %s\n", curenv->env_id, curenv->env_cwd);
+	strcpy(curenv->env_cwd, path);
     return 0;
 }
 
@@ -570,7 +568,6 @@ int sys_getcwd(char *buf) {
 	if (!buf) {
 		return -E_INVAL;
 	}
-	printk("id is %d and cwd is %s\n", curenv->env_id, curenv->env_cwd);
 	strcpy(buf, curenv->env_cwd);
 	return 0;
 }
