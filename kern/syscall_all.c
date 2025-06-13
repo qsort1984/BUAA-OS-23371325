@@ -559,26 +559,6 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 
 // for lab6-shell to change directory
 int sys_chdir(const char *path) {
-    // char abs[MAXPATHLEN];
-    // struct Stat st;
-
-    // todo
-	// 将 path 解析为绝对路径
-    // if (path[0] == '/') {
-    //     strcpy(abs, path);
-    // } else {
-    //     snprintf(abs, MAXPATHLEN, "%s/%s", curenv->env_cwd, path);
-    // }
-    // normalize_path(abs);  // 解析 "..", ".", 多个 "/"
-
-    // if (stat(abs, &st) < 0) {
-	// 	return -E_NOT_FOUND;
-	// }
-    // if (!st.st_isdir) {
-	// 	return -E_NOT_DIR;
-	// }
-
-    // strcpy(curenv->env_cwd, abs);
 	strcpy(curenv->env_cwd, path);
     return 0;
 }

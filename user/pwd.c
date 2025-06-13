@@ -2,8 +2,7 @@
 
 int main() {
 	char path[MAXPATHLEN];
-	// getcwd(path);
-	// printf("%s\n", path);
-    // todo
+	getcwd(path);
+	printf("%s\n", path);
 	return 0;
 }

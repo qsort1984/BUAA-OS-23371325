@@ -60,6 +60,113 @@ int open(const char *path, int mode) {
 	return fd2num(fd);
 }
 
+// int mkdir(const char *path) {
+// 	int r;
+
+// 	if ((r = open(path, O_MKDIR)) < 0) {
+// 		return r;
+// 	}
+// 	close(r);
+
+// 	return 0;
+// }
+
+int format_abspath(char *buf, char *path) {
+	char *rt = path;
+	char *p, *q;
+	char name[MAXNAMELEN];
+	buf[0] = '/';
+	q = buf + 1;
+	path++;
+	while (*path != '\0') {
+		p = path;
+
+		while (*path != '/' && *path != '\0') {
+			path++;
+		}
+
+		memcpy(name, p, path - p);
+		name[path - p] = '\0';
+		while (*path == '/') {
+			path++; // 跳过 '/'
+		}
+		
+		if (name[0] == '\0') {
+			continue;
+		} else if (strcmp(name, ".") == 0) {
+			continue;
+		} else if (strcmp(name, "..") == 0) {
+			if (q > buf + 1) {
+				q--;  // 去掉末尾 '/'
+				while (q > buf && *(q - 1) != '/') {
+					q--; // 找到上一个 '/'
+				}
+			}
+		} else {
+			strcpy(q, name);
+			q += strlen(name);
+			*q = '/';
+			q++;
+		}
+	}
+	
+	if (q > buf + 1) {
+		*(q - 1) = '\0';
+	} else {
+		*q = '\0';
+	}
+
+	return 0;
+}
+
+int chdir(const char *path) {
+	char abspath[MAXPATHLEN];
+	rel2abs(abspath, path);
+	
+	struct Stat st;
+
+    if (stat(path, &st) < 0) {
+		return -E_NOT_FOUND;
+	}
+    if (!st.st_isdir) {
+		return -E_NOT_DIR;
+	}
+
+	char formatedpath[MAXPATHLEN];
+	format_abspath(formatedpath, abspath);
+	panic_on(syscall_chdir(formatedpath));
+	
+	return 0;
+}
+
+int getcwd(char *buf) {
+	panic_on(syscall_getcwd(buf));
+	return 0;
+}
+
+int rel2abs(char *abspath, const char *path) {
+	char tmp[MAXPATHLEN];
+
+	if (!path) {
+		debugf("path is null in rel2abs\n");
+		return -E_INVAL;
+	}
+
+	if (path[0] == '/') {
+		strcpy(tmp, path);	
+	} else {
+		getcwd(tmp);
+		int len = strlen(tmp);
+		tmp[len++] = '/';
+		strcpy(tmp + len, path);
+	}
+
+	format_abspath(abspath, tmp);
+
+	return 0;
+}
+
+
 // Overview:
 //  Close a file descriptor
 int file_close(struct Fd *fd) {
