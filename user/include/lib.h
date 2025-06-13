@@ -120,6 +120,7 @@ int read_map(int fd, u_int offset, void **blk);
 int remove(const char *path);
 int ftruncate(int fd, u_int size);
 int sync(void);
+int mkdir(const char *path);
 int chdir(const char *path);
 int getcwd(char *buf);
 

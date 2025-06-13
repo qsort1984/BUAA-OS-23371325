@@ -80,7 +80,9 @@ int main(int argc, char **argv) {
 	ARGEND
 
 	if (argc == 0) {
-		ls("/", "");
+		char path[MAXPATHLEN];
+		getcwd(path);
+		ls(path, "");
 	} else {
 		for (i = 0; i < argc; i++) {
 			ls(argv[i], argv[i]);

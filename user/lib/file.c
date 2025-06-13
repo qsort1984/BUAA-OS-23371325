@@ -62,16 +62,16 @@ int open(const char *path, int mode) {
 	return fd2num(fd);
 }
 
-// int mkdir(const char *path) {
-// 	int r;
+int mkdir(const char *path) {
+	int r;
 
-// 	if ((r = open(path, O_MKDIR)) < 0) {
-// 		return r;
-// 	}
-// 	close(r);
+	if ((r = open(path, O_MKDIR)) < 0) {
+		return r;
+	}
+	close(r);
 
-// 	return 0;
-// }
+	return 0;
+}
 
 int format_abspath(char *buf, char *path) {
 	char *rt = path;
