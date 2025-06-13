@@ -6,7 +6,6 @@ void usage(void) {
 }
 
 int main(int argc, char *argv[]) {
-	int r;
 	struct Stat st;
 	if (argc < 2) {
 		usage();
@@ -17,13 +16,26 @@ int main(int argc, char *argv[]) {
         if (stat(argv[1], &st) >= 0) {
 			return 0;
 		}
-        // todo
+		char temp[MAXPATHLEN];
+        char *p = path;
+        char *q = temp;
+        while (*p) {
+            *q++ = *p++;
+            if (*(p - 1) == '/') {
+                *q = '\0';
+				if (stat(temp, &st) < 0) {
+					mkdir(temp);
+				}
+            }
+        }
+        *q = '\0';
+        mkdir(temp);
     } else {
         if (stat(argv[1], &st) >= 0) {
 			printf("mkdir: cannot create directory '%s': File exists\n", argv[1]);
             return -1;
 		}
-		if ((r = mkdir(argv[1])) < 0) {
+		if (mkdir(argv[1]) < 0) {
 			printf("mkdir: cannot create directory '%s': No such file or directory\n", argv[1]);
             return -1;
 		}
