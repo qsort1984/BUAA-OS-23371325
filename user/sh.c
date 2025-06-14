@@ -298,7 +298,9 @@ int declare(int argc, char *argv[]) {
 	} else {
 		char *name, *value;
 		if (strcmp(argv[1], "-x") == 0) {
+			debugf("what happend?\n");
 			get_name_val(argv[2], name, value);
+			debugf("what happend?\n");
 			try(set_var(name, value, 0, 0));
 		} else if (strcmp(argv[1], "-r") == 0) {
 			get_name_val(argv[2], name, value);
