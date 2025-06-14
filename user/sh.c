@@ -411,8 +411,8 @@ int main(int argc, char **argv) {
 		if (echocmds) {
 			printf("# %s\n", buf);
 		}
-		if (strncmp(buf, "exit", 4) == 0 && 
-			(buf[4] == '\0' || buf[4] == ' ' || buf[4] == '\n' || buf[4] == '\t' || buf[4] == '\r')) {
+		if (strcmp(buf, "exit") == 0) {
+			// 条件判断不够严谨
 			break;  // 退出主 shell
 		}
 		if ((r = fork()) < 0) {
