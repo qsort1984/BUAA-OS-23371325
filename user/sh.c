@@ -98,7 +98,8 @@ int parsecmd(char **argv, int *rightpipe) {
 				exit();
 			}
 			try(expand_var(buffer[argc], t));
-			argv[argc++] = buffer[argc++];
+			argv[argc] = buffer[argc];
+			argc++;
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
