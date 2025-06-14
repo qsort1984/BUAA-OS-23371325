@@ -263,6 +263,7 @@ int set_var(const char *name, const char *value, int local, int readonly) {
     }
     for (int i = 0; i < MAX_VARS; i++) {
         if (!shell_vars[i].in_use) {
+			debugf("can you see me?\n");
             strcpy(shell_vars[i].name, name);
             strcpy(shell_vars[i].value, value);
             shell_vars[i].local = local;
