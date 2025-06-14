@@ -176,6 +176,54 @@ int parsecmd(char **argv, int *rightpipe) {
 	return argc;
 }
 
+int cd(int argc, char *argv[]) {
+	struct Stat st;
+	char *path;
+
+	if (argc == 1) {
+		// 只有 "cd"，切换到根目录
+		path = "/";
+	} else if (argc == 2) {
+		path = argv[1];
+
+		if (stat(path, &st) < 0) {
+			debugf("cd: The directory '%s' does not exist\n", argv[1]);
+			return 1;
+		}
+		if (!st.st_isdir) {
+			debugf("cd: '%s' is not a directory\n", argv[1]);
+			return 1;
+		}
+	} else {
+		debugf("Too many args for cd command\n");
+		return 1;
+	}
+
+	try(chdir(shell_envid, path));
+	return 0;
+}
+
+int pwd(int argc) {
+	if (argc == 1) {
+		char path[MAXPATHLEN];
+		getcwd(path);
+		printf("%s\n", path);
+	} else {
+		debugf("pwd: expected 0 arguments; got %d\n", argc - 1);
+		return 2;
+	}
+
+	return 0;
+}
+
+int declare(int argc, char *argv[]) {
+
+}
+
+int unset(int argc, char *argv[]) {
+	
+}
+
 void runcmd(char *s) {
 	gettoken(s, 0);
 
@@ -189,44 +237,15 @@ void runcmd(char *s) {
 
 	// 处理内建指令
 	if (strcmp(argv[0], "cd") == 0) {
-		// todo
-		struct Stat st;
-		char *path;
-
-		if (argc == 1) {
-			// 只有 "cd"，切换到根目录
-			path = "/";
-		} else if (argc == 2) {
-			path = argv[1];
-
-			if (stat(path, &st) < 0) {
-				debugf("cd: The directory '%s' does not exist\n", argv[1]);
-				return 1;
-			}
-			if (!st.st_isdir) {
-				debugf("cd: '%s' is not a directory\n", argv[1]);
-				return 1;
-			}
-		} else {
-			debugf("Too many args for cd command\n");
-			return 1;
-		}
-
-		try(chdir(shell_envid, path));
-		return 0;
+		return cd(argc, argv);
 	} else if (strcmp(argv[0], "pwd") == 0) {
-		if (argc == 1) {
-			char path[MAXPATHLEN];
-			getcwd(path);
-			printf("%s\n", path);
-		} else {
-			debugf("pwd: expected 0 arguments; got %d\n", argc - 1);
-			return 2;
-		}
-
-		return 0;
+		return pwd(argc);
 	} else if (strcmp(argv[0], "exit") == 0) {
 		exit();
+	} else if (strcmp(argv[0], "declare") == 0) {
+		return declare(argc, argv);
+	} else if (strcmp(argv[0], "unset") == 0) {
+		return unset(argc, argv);
 	}
 
 	int child = spawn(argv[0], argv);
@@ -318,8 +337,15 @@ int main(int argc, char **argv) {
 		}
 		readline(buf, sizeof buf);
 
+		// 忽略注释
 		if (buf[0] == '#') {
 			continue;
+		}
+		for (int i = 0; i < strlen(buf); i++) {
+			if (buf[i] == '#') {
+				buf[i] = '\0';
+				break;
+			}
 		}
 		if (echocmds) {
 			printf("# %s\n", buf);
