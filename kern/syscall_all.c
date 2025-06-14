@@ -86,12 +86,12 @@ int sys_get_env_var(char *ret, char *name, int shell_id) {
 			continue;
 		}
 		if (strcmp(name, env_vars[i].name) == 0) {
-			strcpy(ret, env_vars[i].value);
+			ret = env_vars[i].value;
 			return 0;
 		}
 	}
 
-	strcpy(ret, name);
+	ret = name;
 	return -1;
 }
 

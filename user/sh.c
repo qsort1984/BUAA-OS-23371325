@@ -10,8 +10,6 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 #define MAX_NAME_LEN 16
 #define MAX_VAL_LEN 16
 
-char buffer[MAX_VAL_LEN + 1];
-
 /* Overview:
  *   Parse the next token from the string at s.
  *
@@ -76,7 +74,7 @@ int expand_var(char *ret, const char *word) {
 	if (*word == '$') {
 		try(syscall_get_env_var(ret, word + 1, shell_id));
 	} else {
-		strcpy(ret, word);
+		ret = word;
 	}
 
 	return 0;
@@ -98,8 +96,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			try(expand_var(buffer, t));
-			argv[argc++] = buffer;
+			try(expand_var(argv[argc++], t));
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
