@@ -62,6 +62,7 @@ int _gettoken(char *s, char **p1, char **p2) {
 		s++;
 	}
 	*p2 = s;
+	//* 将 $NAME 也视为单词
 	return 'w';
 }
 
@@ -77,6 +78,20 @@ int gettoken(char *s, char **p1) {
 	*p1 = np1;
 	nc = _gettoken(np2, &np1, &np2);
 	return c;
+}
+
+char *expand_var(char *word) {
+	if (*word == '$') {
+		char *p = ++word;
+		for (int i = 0; i < MAX_VARS; i++) {
+			if (shell_vars[i].in_use && strcmp(shell_vars[i].name, p) == 0) {
+				strcpy(p, shell_vars[i].value);
+				return p;
+			}
+		}
+	}
+
+	return word;
 }
 
 #define MAXARGS 128
@@ -95,7 +110,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			argv[argc++] = t;
+			argv[argc++] = expand_var(t);
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
@@ -303,6 +318,7 @@ int declare(int argc, char *argv[]) {
 int unset(int argc, char *argv[]) {
 	if (argc == 1) {
 		printf("usage: unset NAME\n");
+		return 0;
 	} else {
 		for (int i = 0; i < MAX_VARS; i++) {
 			if (strcmp(argv[1], shell_vars[i].name) == 0 && shell_vars[i].in_use) {
@@ -315,6 +331,8 @@ int unset(int argc, char *argv[]) {
 			}
 		}
 	}
+
+	return -1;
 }
 
 void runcmd(char *s) {
