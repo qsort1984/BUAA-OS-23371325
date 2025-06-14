@@ -10,6 +10,8 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 #define MAX_NAME_LEN 16
 #define MAX_VAL_LEN 16
 
+char buf[MAX_VAL_LEN + 1];
+
 /* Overview:
  *   Parse the next token from the string at s.
  *
@@ -96,7 +98,8 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			try(expand_var(argv[argc++], t));
+			try(expand_var(buf, t));
+			argv[argc++] = buf;
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
