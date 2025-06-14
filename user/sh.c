@@ -256,7 +256,7 @@ void readline(char *buf, u_int n) {
 				i = -1;
 			}
 			if (buf[i] != '\b') {
-				debugf("\b");
+				printf("\b");
 			}
 		}
 		if (buf[i] == '\r' || buf[i] == '\n') {
@@ -274,7 +274,7 @@ void readline(char *buf, u_int n) {
 char buf[1024];
 
 void usage(void) {
-	debugf("usage: sh [-ix] [script-file]\n");
+	printf("usage: sh [-ix] [script-file]\n");
 	exit();
 }
 
@@ -283,11 +283,11 @@ int main(int argc, char **argv) {
 	int interactive = iscons(0);
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
-	debugf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	debugf("::                                                         ::\n");
-	debugf("::                     MOS Shell 2024                      ::\n");
-	debugf("::                                                         ::\n");
-	debugf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	printf("::                                                         ::\n");
+	printf("::                     MOS Shell 2024                      ::\n");
+	printf("::                                                         ::\n");
+	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	ARGBEGIN {
 	case 'i':
 		interactive = 1;
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 	}
 	for (;;) {
 		if (interactive) {
-			debugf("\n$ ");
+			printf("\n$ ");
 		}
 		readline(buf, sizeof buf);
 
@@ -320,7 +320,7 @@ int main(int argc, char **argv) {
 			continue;
 		}
 		if (echocmds) {
-			debugf("# %s\n", buf);
+			printf("# %s\n", buf);
 		}
 		if ((r = fork()) < 0) {
 			user_panic("fork: %d", r);
