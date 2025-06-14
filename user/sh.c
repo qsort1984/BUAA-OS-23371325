@@ -272,9 +272,7 @@ int set_var(const char *name, const char *value, int local, int readonly) {
 
 void get_name_val(char *src, char *name, char *value) {
 	char *p = src;
-	debugf("%s\n", p);
 	while (*p && *p != '=') {
-		debugf("%s\n", p);
 		*name++ = *p++;
 	}
 	*name = '\0';
@@ -298,7 +296,7 @@ int declare(int argc, char *argv[]) {
 			}
 		}
 	} else {
-		char *name, *value;
+		char name[MAX_NAME_LEN + 1], value[MAX_VAL_LEN + 1];
 		if (strcmp(argv[1], "-x") == 0) {
 			get_name_val(argv[2], name, value);
 			try(set_var(name, value, 0, 0));
