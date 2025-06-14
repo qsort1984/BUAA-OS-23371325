@@ -78,6 +78,7 @@ int unset_env_var(char *name, int shell_id) {
 }
 
 char *get_env_var(char *name, int shell_id) {
+	printk("1\n");
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -85,6 +86,7 @@ char *get_env_var(char *name, int shell_id) {
 		if (env_vars[i].shell_id != shell_id && env_vars[i].shell_id != 0) {
 			continue;
 		}
+		printk("2\n");
 		if (strcmp(name, env_vars[i].name) == 0) {
 			return env_vars[i].value;
 		}

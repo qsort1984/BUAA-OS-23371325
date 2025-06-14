@@ -11,8 +11,7 @@ int alloc_shell_id() {
 }
 
 int declare_env_var(char *name, char *value, int shell_id, int readonly) {
-	int i;
-	for (i = 0; i < vars_num; i++) {
+	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
 		}
@@ -39,8 +38,7 @@ int declare_env_var(char *name, char *value, int shell_id, int readonly) {
 }
 
 int unset_env_var(char *name, int shell_id) {
-	int i;
-	for (i = 0; i < vars_num; i++) {
+	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
 		}
@@ -59,8 +57,7 @@ int unset_env_var(char *name, int shell_id) {
 }
 
 char *get_env_var(char *name, int shell_id) {
-	int i;
-	for (i = 0; i < vars_num; i++) {
+	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
 		}
@@ -76,7 +73,7 @@ char *get_env_var(char *name, int shell_id) {
 }
 
 int print_vars(int shell_id) {
-	for (i = 0; i < vars_num; i++) {
+	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
 		}
