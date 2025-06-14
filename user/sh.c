@@ -286,7 +286,7 @@ int unset(int argc, char *argv[]) {
 	return 0;
 }
 
-void runcmd(char *s) {
+int runcmd(char *s) {
 	gettoken(s, 0);
 
 	char *argv[MAXARGS];
@@ -302,8 +302,6 @@ void runcmd(char *s) {
 		return cd(argc, argv);
 	} else if (strcmp(argv[0], "pwd") == 0) {
 		return pwd(argc);
-	} else if (strcmp(argv[0], "exit") == 0) {
-		exit();
 	} else if (strcmp(argv[0], "declare") == 0) {
 		return declare(argc, argv);
 	} else if (strcmp(argv[0], "unset") == 0) {
@@ -412,6 +410,10 @@ int main(int argc, char **argv) {
 		}
 		if (echocmds) {
 			printf("# %s\n", buf);
+		}
+		if (strncmp(buf, "exit", 4) == 0 && 
+			(buf[4] == '\0' || buf[4] == ' ' || buf[4] == '\n' || buf[4] == '\t' || buf[4] == '\r')) {
+			break;  // 退出主 shell
 		}
 		if ((r = fork()) < 0) {
 			user_panic("fork: %d", r);
