@@ -188,7 +188,7 @@ void runcmd(char *s) {
 	argv[argc] = 0;
 
 	// 处理内建指令
-	if (strcmp(argv[0], "cd")) {
+	if (strcmp(argv[0], "cd") == 0) {
 		// todo
 		struct Stat st;
 		char *path;
@@ -214,11 +214,11 @@ void runcmd(char *s) {
 
 		try(chdir(shell_envid, path));
 		return 0;
-	} else if (strcmp(argv[0], "pwd")) {
+	} else if (strcmp(argv[0], "pwd") == 0) {
 		if (argc == 1) {
 			char path[MAXPATHLEN];
 			getcwd(path);
-			debugf("%s\n", path);
+			printf("%s\n", path);
 		} else {
 			debugf("pwd: expected 0 arguments; got %d\n", argc - 1);
 			return 2;
