@@ -225,6 +225,8 @@ void runcmd(char *s) {
 		}
 
 		return 0;
+	} else if (strcmp(argv[0], "exit") == 0) {
+		exit();
 	}
 
 	int child = spawn(argv[0], argv);
