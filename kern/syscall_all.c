@@ -77,7 +77,7 @@ int sys_unset_env_var(char *name, int shell_id) {
 	return -1;
 }
 
-int sys_get_env_var(char **ret, char *name, int shell_id) {
+int sys_get_env_var(char *ret, char *name, int shell_id) {
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -86,12 +86,12 @@ int sys_get_env_var(char **ret, char *name, int shell_id) {
 			continue;
 		}
 		if (strcmp(name, env_vars[i].name) == 0) {
-			*ret = env_vars[i].value;
+			strcpy(ret, env_vars[i].value);
 			return 0;
 		}
 	}
 
-	*ret = name;
+	strcpy(ret, name);
 	return -1;
 }
 

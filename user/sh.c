@@ -3,12 +3,15 @@
 
 #define WHITESPACE " \t\r\n"
 #define SYMBOLS "<|>&;()"
+#define MAXARGS 128
 
 u_int shell_envid; // 当前 shell 对应的进程 id
 int shell_id; // 当前 shell 对应的环境变量页面 id
 
 #define MAX_NAME_LEN 16
 #define MAX_VAL_LEN 16
+
+char buffer[MAXARGS + 1][MAX_VAL_LEN + 1];
 
 /* Overview:
  *   Parse the next token from the string at s.
@@ -70,18 +73,15 @@ int gettoken(char *s, char **p1) {
 	return c;
 }
 
-int expand_var(char **ret, const char *word) {
+int expand_var(char *buffer, const char *word) {
 	if (*word == '$') {
-		try(syscall_get_env_var(ret, word + 1, shell_id));
-		printf("what happend?%s\n", *ret);
+		try(syscall_get_env_var(buffer, word + 1, shell_id));
 	} else {
-		*ret = word;
+		strcpy(buffer, word);
 	}
 
 	return 0;
 }
-
-#define MAXARGS 128
 
 int parsecmd(char **argv, int *rightpipe) {
 	int argc = 0;
@@ -97,7 +97,8 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			try(expand_var(&argv[argc++], t));
+			try(expand_var(buffer[argc], t));
+			argv[argc++] = buffer[argc++];
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
