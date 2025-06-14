@@ -97,6 +97,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				exit();
 			}
 			try(expand_var(&argv[argc++], t));
+			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
 				debugf("syntax error: < not followed by word\n");
