@@ -29,9 +29,9 @@ int main(int argc, char *argv[]) {
 	}
 
     if (strcmp(argv[1], "-r") == 0) {
-        return rm(argv[1], 1);
+        return rm(argv[2], 1);
     } else if (strcmp(argv[1], "-rf") == 0){
-        return rm(argv[1], 0);
+        return rm(argv[2], 0);
     } else {
         if (stat(argv[1], &st) < 0) {
             printf("rm: cannot remove '%s': No such file or directory\n", argv[1]);

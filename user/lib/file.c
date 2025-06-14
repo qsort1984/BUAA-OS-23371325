@@ -354,7 +354,7 @@ int remove(const char *path) {
 	rel2abs(abspath, path);
 
 	/* Exercise 5.13: Your code here. */
-	return fsipc_remove(path);
+	return fsipc_remove(abspath);
 }
 
 // Overview:
