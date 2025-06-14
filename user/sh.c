@@ -272,22 +272,19 @@ int set_var(const char *name, const char *value, int local, int readonly) {
 
 void get_name_val(const char *src, char *name, char *value) {
 	char *p = src;
-	debugf("what happend?\n");
+	debug("%s\n", p);
 	while (*p && *p != '=') {
+		debug("%s\n", p);
 		*name++ = *p++;
 	}
-	debugf("what happend?\n");
 	*name = '\0';
 	if (*p) {
-		debugf("what happend?\n");
 		p++;
 		while (*p) {
 			*value++ = *p++;
 		}
-		debugf("what happend?\n");
 		*value = '\0'; 
 	} else {
-		debugf("what happend?\n");
 		*value = '\0';
 	}
 }
