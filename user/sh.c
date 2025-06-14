@@ -85,6 +85,7 @@ char *expand_var(char *word) {
 		char *p = ++word;
 		for (int i = 0; i < MAX_VARS; i++) {
 			if (shell_vars[i].in_use && strcmp(shell_vars[i].name, p) == 0) {
+				debugf("can you see me?");
 				strcpy(p, shell_vars[i].value);
 				return p;
 			}
