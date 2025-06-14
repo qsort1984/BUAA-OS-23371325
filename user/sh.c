@@ -84,10 +84,6 @@ char *expand_var(const char *word) {
 	if (*word == '$') {
 		char *p = word + 1;
 		for (int i = 0; i < MAX_VARS; i++) {
-			if (shell_vars[i].in_use) {
-				debugf("%s\n", p);
-				debugf("%s\n", shell_vars[i].name);
-			}
 			if (shell_vars[i].in_use && strcmp(shell_vars[i].name, p) == 0) {
 				strcpy(p, shell_vars[i].value);
 				return p;
@@ -263,7 +259,6 @@ int set_var(const char *name, const char *value, int local, int readonly) {
     }
     for (int i = 0; i < MAX_VARS; i++) {
         if (!shell_vars[i].in_use) {
-			debugf("can you see me?\n");
             strcpy(shell_vars[i].name, name);
             strcpy(shell_vars[i].value, value);
             shell_vars[i].local = local;
