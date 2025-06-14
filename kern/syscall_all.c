@@ -5,6 +5,7 @@
 #include <printk.h>
 #include <sched.h>
 #include <syscall.h>
+#include <env_var.h>
 
 extern struct Env *curenv;
 
@@ -595,6 +596,11 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_read_dev] = sys_read_dev,
 	[SYS_chdir] = sys_chdir,
 	[SYS_getcwd] = sys_getcwd,
+	[SYS_shell_id_alloc] = alloc_shell_id,
+	[SYS_env_var_unset] = unset_env_var,
+	[SYS_print_vars] = print_vars,
+	[SYS_declare_env_var] = declare_env_var,
+	[SYS_get_env_var] = get_env_var,
 };
 
 /* Overview:

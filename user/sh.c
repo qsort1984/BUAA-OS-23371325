@@ -4,21 +4,8 @@
 #define WHITESPACE " \t\r\n"
 #define SYMBOLS "<|>&;()"
 
-#define MAX_VARS 64
-#define MAX_NAME_LEN 16
-#define MAX_VAL_LEN 16
-
-struct EnvVar {
-    char name[MAX_NAME_LEN + 1];
-    char value[MAX_VAL_LEN + 1];
-    int local;  // 是否是局部变量
-    int readonly;  // 是否是只读变量
-    int in_use;    // 是否占用
-};
-
-static struct EnvVar shell_vars[MAX_VARS];
-
-u_int shell_envid;
+u_int shell_envid; // 当前 shell 对应的进程 id
+int shell_id; // 当前 shell 对应的环境变量页面 id
 
 /* Overview:
  *   Parse the next token from the string at s.
@@ -82,13 +69,7 @@ int gettoken(char *s, char **p1) {
 
 char *expand_var(const char *word) {
 	if (*word == '$') {
-		char *p = word + 1;
-		for (int i = 0; i < MAX_VARS; i++) {
-			if (shell_vars[i].in_use && strcmp(shell_vars[i].name, p) == 0) {
-				strcpy(p, shell_vars[i].value);
-				return p;
-			}
-		}
+		return syscall_get_env_var(word + 1, shell_id);
 	}
 
 	return word;
@@ -245,31 +226,6 @@ int pwd(int argc) {
 	return 0;
 }
 
-int set_var(const char *name, const char *value, int local, int readonly) {
-    for (int i = 0; i < MAX_VARS; i++) {
-        if (shell_vars[i].in_use && strcmp(shell_vars[i].name, name) == 0) {
-            if (shell_vars[i].readonly) {
-				return -1;
-			}
-            strcpy(shell_vars[i].value, value);
-            shell_vars[i].local = local;
-			shell_vars[i].readonly = readonly;
-            return 0;
-        }
-    }
-    for (int i = 0; i < MAX_VARS; i++) {
-        if (!shell_vars[i].in_use) {
-            strcpy(shell_vars[i].name, name);
-            strcpy(shell_vars[i].value, value);
-            shell_vars[i].local = local;
-            shell_vars[i].readonly = readonly;
-			shell_vars[i].in_use = 1;
-            return 0;
-        }
-    }
-    return -1;
-}
-
 void get_name_val(char *src, char *name, char *value) {
 	char *p = src;
 	while (*p && *p != '=') {
@@ -290,25 +246,21 @@ void get_name_val(char *src, char *name, char *value) {
 int declare(int argc, char *argv[]) {
 	if (argc == 1) {
 		// 输出当前 shell 的所有变量
-		for (int i = 0; i < MAX_VARS; i++) {
-			if (shell_vars[i].in_use) {
-				printf("%s=%s\n", shell_vars[i].name, shell_vars[i].value);
-			}
-		}
+		try(syscall_print_vars(shell_id));
 	} else {
 		char name[MAX_NAME_LEN + 1], value[MAX_VAL_LEN + 1];
 		if (strcmp(argv[1], "-x") == 0) {
 			get_name_val(argv[2], name, value);
-			try(set_var(name, value, 0, 0));
+			try(syscall_declare_env_var(name, value, 0, 0));
 		} else if (strcmp(argv[1], "-r") == 0) {
 			get_name_val(argv[2], name, value);
-			try(set_var(name, value, 1, 1));
+			try(syscall_declare_env_var(name, value, shell_id, 1));
 		} else if (strcmp(argv[1], "-xr") == 0) {
 			get_name_val(argv[2], name, value);
-			try(set_var(name, value, 0, 1));
+			try(syscall_declare_env_var(name, value, 0, 1));
 		} else {
 			get_name_val(argv[1], name, value);
-			try(set_var(name, value, 1, 0));
+			try(syscall_declare_env_var(name, value, shell_id, 0));
 		}
 	}
 
@@ -320,19 +272,10 @@ int unset(int argc, char *argv[]) {
 		printf("usage: unset NAME\n");
 		return 0;
 	} else {
-		for (int i = 0; i < MAX_VARS; i++) {
-			if (strcmp(argv[1], shell_vars[i].name) == 0 && shell_vars[i].in_use) {
-				// 若变量 NAME 不是只读变量，则删除变量 NAME
-				if (!shell_vars[i].readonly) {
-					shell_vars[i].in_use = 0;
-				}
-
-				return 0;
-			}
-		}
+		try(syscall_unset_env_var(argv[1], shell_id));
 	}
 
-	return -1;
+	return 0;
 }
 
 void runcmd(char *s) {
@@ -415,6 +358,7 @@ int main(int argc, char **argv) {
 	int interactive = iscons(0);
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
+	shell_id = syscall_shell_id_alloc();
 	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	printf("::                                                         ::\n");
 	printf("::                     MOS Shell 2024                      ::\n");

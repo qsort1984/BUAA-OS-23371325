@@ -68,8 +68,15 @@ int syscall_ipc_recv(void *dstva);
 int syscall_cgetc(void);
 int syscall_write_dev(void *va, u_int dev, u_int len);
 int syscall_read_dev(void *va, u_int dev, u_int len);
+
 int syscall_chdir(u_int envid, const char *path);
 int syscall_getcwd(char *buf);
+
+int syscall_shell_id_alloc();
+int syscall_unset_env_var(char *name, int shell_id);
+int syscall_print_vars(int shell_id);
+int syscall_declare_env_var(char *name, char *value, int shell_id, int readonly);
+char *syscall_get_env_var(char *name, int shell_id);
 
 // ipc.c
 void ipc_send(u_int whom, u_int val, const void *srcva, u_int perm);

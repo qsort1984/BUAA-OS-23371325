@@ -82,3 +82,23 @@ int syscall_chdir(u_int envid, const char *path) {
 int syscall_getcwd(char *buf) {
 	return msyscall(SYS_getcwd, buf);
 }
+
+int syscall_shell_id_alloc() {
+	return msyscall(SYS_shell_id_alloc);
+}
+
+int syscall_unset_env_var(char *name, int shell_id) {
+	return msyscall(SYS_env_var_unset, name, shell_id);
+}
+
+int syscall_print_vars(int shell_id) {
+	return msyscall(SYS_print_vars, shell_id);
+}
+
+int syscall_declare_env_var(char *name, char *value, int shell_id, int readonly) {
+	return msyscall(SYS_declare_env_var, name, value, shell_id, readonly);
+}
+
+char *syscall_get_env_var(char *name, int shell_id) {
+	return msyscall(SYS_get_env_var, name, shell_id);
+}
