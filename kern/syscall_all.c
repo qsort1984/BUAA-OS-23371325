@@ -27,11 +27,11 @@ struct EnvVar env_vars[MAX_VARS];
 static int vars_num = 0;
 static int idNow = 1;
 
-int alloc_shell_id() {
+int sys_shell_id_alloc() {
 	return idNow++;
 }
 
-int declare_env_var(char *name, char *value, int shell_id, int readonly) {
+int sys_declare_env_var(char *name, char *value, int shell_id, int readonly) {
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -58,7 +58,7 @@ int declare_env_var(char *name, char *value, int shell_id, int readonly) {
 	return 0;
 }
 
-int unset_env_var(char *name, int shell_id) {
+int sys_unset_env_var(char *name, int shell_id) {
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -77,8 +77,7 @@ int unset_env_var(char *name, int shell_id) {
 	return -1;
 }
 
-char *get_env_var(char *name, int shell_id) {
-	printk("1\n");
+int sys_get_env_var(char *ret, char *name, int shell_id) {
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -86,16 +85,17 @@ char *get_env_var(char *name, int shell_id) {
 		if (env_vars[i].shell_id != shell_id && env_vars[i].shell_id != 0) {
 			continue;
 		}
-		printk("2\n");
 		if (strcmp(name, env_vars[i].name) == 0) {
-			return env_vars[i].value;
+			strcpy(ret, env_vars[i].value);
+			return 0;
 		}
 	}
 
-	return name;
+	strcpy(ret, name);
+	return -1;
 }
 
-int print_vars(int shell_id) {
+int sys_print_vars(int shell_id) {
 	for (int i = 0; i < vars_num; i++) {
 		if (!env_vars[i].in_use) {
 			continue;
@@ -673,26 +673,6 @@ int sys_getcwd(char *buf) {
 	}
 	strcpy(buf, curenv->env_cwd);
 	return 0;
-}
-
-int sys_shell_id_alloc() {
-	return alloc_shell_id();
-}
-
-int sys_declare_env_var(char *name, char *value, int shell_id, int readonly) {
-	return declare_env_var(name, value, shell_id, readonly);
-}
-
-int sys_unset_env_var(char *name, int shell_id) {
-	return unset_env_var(name, shell_id);
-}
-
-char *sys_get_env_var(char *name, int shell_id) {
-	return get_env_var(name, shell_id);
-}
-
-int sys_print_vars(int shell_id) {
-	return print_vars(shell_id);
 }
 
 void *syscall_table[MAX_SYSNO] = {

@@ -76,7 +76,7 @@ int syscall_shell_id_alloc();
 int syscall_unset_env_var(char *name, int shell_id);
 int syscall_print_vars(int shell_id);
 int syscall_declare_env_var(char *name, char *value, int shell_id, int readonly);
-char *syscall_get_env_var(char *name, int shell_id);
+int syscall_get_env_var(char *ret, char *name, int shell_id);
 
 // ipc.c
 void ipc_send(u_int whom, u_int val, const void *srcva, u_int perm);
