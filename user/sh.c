@@ -270,7 +270,7 @@ int set_var(const char *name, const char *value, int local, int readonly) {
     return -1;
 }
 
-void get_name_val(const char *src, char *name, char *value) {
+void get_name_val(char *src, char *name, char *value) {
 	char *p = src;
 	debugf("%s\n", p);
 	while (*p && *p != '=') {
