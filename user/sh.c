@@ -73,7 +73,7 @@ int gettoken(char *s, char **p1) {
 int expand_var(char **ret, const char *word) {
 	if (*word == '$') {
 		try(syscall_get_env_var(ret, word + 1, shell_id));
-		printf("%s\n", *ret);
+		printf("what happend?%s\n", *ret);
 	} else {
 		*ret = word;
 	}
