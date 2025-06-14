@@ -80,13 +80,15 @@ int gettoken(char *s, char **p1) {
 	return c;
 }
 
-char *expand_var(char *word) {
+char *expand_var(const char *word) {
 	if (*word == '$') {
-		char *p = ++word;
-		debugf("can you see me?");
+		char *p = word + 1;
 		for (int i = 0; i < MAX_VARS; i++) {
+			if (shell_vars[i].in_use) {
+				debugf("%s\n", p);
+				debugf("%s\n", shell_vars[i].name);
+			}
 			if (shell_vars[i].in_use && strcmp(shell_vars[i].name, p) == 0) {
-				debugf("can you see me?");
 				strcpy(p, shell_vars[i].value);
 				return p;
 			}
