@@ -125,7 +125,7 @@ int chdir(u_int envid, const char *path) {
 	char abspath[MAXPATHLEN];
 	rel2abs(abspath, path);
 	
-	panic_on(syscall_chdir(env_id, abspath));
+	panic_on(syscall_chdir(envid, abspath));
 	
 	return 0;
 }
