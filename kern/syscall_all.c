@@ -85,10 +85,8 @@ int sys_get_env_var(char **ret, char *name, int shell_id) {
 		if (env_vars[i].shell_id != shell_id && env_vars[i].shell_id != 0) {
 			continue;
 		}
-		printk("%s\n", env_vars[i].value);
 		if (strcmp(name, env_vars[i].name) == 0) {
 			*ret = env_vars[i].value;
-			printk("%s\n", *ret);
 			return 0;
 		}
 	}
