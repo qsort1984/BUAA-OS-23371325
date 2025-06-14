@@ -121,11 +121,11 @@ int format_abspath(char *buf, char *path) {
 	return 0;
 }
 
-int chdir(const char *path) {
+int chdir(u_int envid, const char *path) {
 	char abspath[MAXPATHLEN];
 	rel2abs(abspath, path);
 	
-	panic_on(syscall_chdir(abspath));
+	panic_on(syscall_chdir(env_id, abspath));
 	
 	return 0;
 }

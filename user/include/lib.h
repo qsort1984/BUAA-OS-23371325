@@ -68,7 +68,7 @@ int syscall_ipc_recv(void *dstva);
 int syscall_cgetc(void);
 int syscall_write_dev(void *va, u_int dev, u_int len);
 int syscall_read_dev(void *va, u_int dev, u_int len);
-int syscall_chdir(const char *path);
+int syscall_chdir(u_int envid, const char *path);
 int syscall_getcwd(char *buf);
 
 // ipc.c
@@ -121,7 +121,7 @@ int remove(const char *path);
 int ftruncate(int fd, u_int size);
 int sync(void);
 int mkdir(const char *path);
-int chdir(const char *path);
+int chdir(u_int envid, const char *path);
 int rel2abs(char *abspath, const char *path);
 int getcwd(char *buf);
 

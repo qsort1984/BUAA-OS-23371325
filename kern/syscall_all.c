@@ -559,8 +559,10 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 
 
 // for lab6-shell to change directory
-int sys_chdir(const char *path) {
-	strcpy(curenv->env_cwd, path);
+int sys_chdir(u_int envid, const char *path) {
+	struct Env *e;
+	envid2env(envid, &e, 0); 
+	strcpy(e->env_cwd, path);
     return 0;
 }
 

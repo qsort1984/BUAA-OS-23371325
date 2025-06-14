@@ -75,8 +75,8 @@ int syscall_read_dev(void *va, u_int dev, u_int size) {
 	return msyscall(SYS_read_dev, va, dev, size);
 }
 
-int syscall_chdir(const char *path) {
-	return msyscall(SYS_chdir, path);
+int syscall_chdir(u_int envid, const char *path) {
+	return msyscall(SYS_chdir, envid, path);
 }
 
 int syscall_getcwd(char *buf) {

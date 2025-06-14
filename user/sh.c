@@ -4,6 +4,8 @@
 #define WHITESPACE " \t\r\n"
 #define SYMBOLS "<|>&;()"
 
+u_int shell_envid;
+
 /* Overview:
  *   Parse the next token from the string at s.
  *
@@ -188,8 +190,41 @@ void runcmd(char *s) {
 	// 处理内建指令
 	if (strcmp(argv[0], "cd")) {
 		// todo
+		struct Stat st;
+		char *path;
+
+		if (argc == 1) {
+			// 只有 "cd"，切换到根目录
+			path = "/";
+		} else if (argc == 2) {
+			path = argv[1];
+
+			if (stat(path, &st) < 0) {
+				printf("cd: The directory '%s' does not exist\n", argv[1]);
+				return 1;
+			}
+			if (!st.st_isdir) {
+				printf("cd: '%s' is not a directory\n", argv[1]);
+				return 1;
+			}
+		} else {
+			printf("Too many args for cd command\n");
+			return 1;
+		}
+
+		try(chdir(shell_envid, path));
+		return 0;
 	} else if (strcmp(argv[0], "pwd")) {
-		// todo
+		if (argc == 1) {
+			char path[MAXPATHLEN];
+			getcwd(path);
+			printf("%s\n", path);
+		} else {
+			printf("pwd: expected 0 arguments; got %d\n", argc - 1);
+			return 2;
+		}
+
+		return 0;
 	}
 
 	int child = spawn(argv[0], argv);
@@ -247,6 +282,7 @@ int main(int argc, char **argv) {
 	int r;
 	int interactive = iscons(0);
 	int echocmds = 0;
+	shell_envid = syscall_getenvid();
 	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	printf("::                                                         ::\n");
 	printf("::                     MOS Shell 2024                      ::\n");
