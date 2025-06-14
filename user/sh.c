@@ -243,6 +243,9 @@ void get_name_val(char *src, char *name, char *value) {
 	}
 }
 
+#define MAX_NAME_LEN 16
+#define MAX_VAL_LEN 16
+
 int declare(int argc, char *argv[]) {
 	if (argc == 1) {
 		// 输出当前 shell 的所有变量
