@@ -73,7 +73,8 @@ int gettoken(char *s, char **p1) {
 char *expand_var(const char *word) {
 	if (*word == '$') {
 		char ret[MAX_VAL_LEN + 1];
-		return syscall_get_env_var(ret, word + 1, shell_id);
+		try(syscall_get_env_var(ret, word + 1, shell_id));
+		return ret;
 	}
 
 	return word;
