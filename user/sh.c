@@ -96,7 +96,8 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			try(expand_var(argv[argc++], t));
+			try(expand_var(argv[argc], t));
+			argc++;
 			break;
 		case '<':
 			if (gettoken(0, &t) != 'w') {
