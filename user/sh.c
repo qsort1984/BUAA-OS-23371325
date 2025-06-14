@@ -4,6 +4,20 @@
 #define WHITESPACE " \t\r\n"
 #define SYMBOLS "<|>&;()"
 
+#define MAX_VARS 64
+#define MAX_NAME_LEN 16
+#define MAX_VAL_LEN 16
+
+struct EnvVar {
+    char name[MAX_NAME_LEN + 1];
+    char value[MAX_VAL_LEN + 1];
+    int local;  // 是否是局部变量
+    int readonly;  // 是否是只读变量
+    int in_use;    // 是否占用
+};
+
+static struct EnvVar shell_vars[MAX_VARS];
+
 u_int shell_envid;
 
 /* Overview:
@@ -216,12 +230,91 @@ int pwd(int argc) {
 	return 0;
 }
 
-int declare(int argc, char *argv[]) {
+int set_var(const char *name, const char *value, int local, int readonly) {
+    for (int i = 0; i < MAX_VARS; i++) {
+        if (shell_vars[i].in_use && strcmp(shell_vars[i].name, name) == 0) {
+            if (shell_vars[i].readonly) {
+				return -1;
+			}
+            strcpy(shell_vars[i].value, value);
+            shell_vars[i].local = local;
+			shell_vars[i].readonly = readonly;
+            return 0;
+        }
+    }
+    for (int i = 0; i < MAX_VARS; i++) {
+        if (!shell_vars[i].in_use) {
+            strcpy(shell_vars[i].name, name);
+            strcpy(shell_vars[i].value, value);
+            shell_vars[i].local = local;
+            shell_vars[i].readonly = readonly;
+			shell_vars[i].in_use = 1;
+            return 0;
+        }
+    }
+    return -1;
+}
 
+void get_name_val(const char *src, char *name, char *value) {
+	char *p = src;
+	while (*p && *p != '=') {
+		*name++ = *p++;
+	}
+	*name = '\0';
+	if (*p) {
+		p++;
+		while (*p) {
+			*value++ = *p++;
+		}
+		*value = '\0'; 
+	} else {
+		*value = '\0';
+	}
+}
+
+int declare(int argc, char *argv[]) {
+	if (argc == 1) {
+		// 输出当前 shell 的所有变量
+		for (int i = 0; i < MAX_VARS; i++) {
+			if (shell_vars[i].in_use) {
+				printf("%s=%s\n", shell_vars[i].name, shell_vars[i].value);
+			}
+		}
+	} else {
+		char *name, *value;
+		if (strcmp(argv[1], "-x") == 0) {
+			get_name_val(argv[2], name, value);
+			try(set_var(name, value, 0, 0));
+		} else if (strcmp(argv[1], "-r") == 0) {
+			get_name_val(argv[2], name, value);
+			try(set_var(name, value, 1, 1));
+		} else if (strcmp(argv[1], "-xr") == 0) {
+			get_name_val(argv[2], name, value);
+			try(set_var(name, value, 0, 1));
+		} else {
+			get_name_val(argv[1], name, value);
+			try(set_var(name, value, 1, 0));
+		}
+	}
+
+	return 0;
 }
 
 int unset(int argc, char *argv[]) {
-	
+	if (argc == 1) {
+		printf("usage: unset NAME\n");
+	} else {
+		for (int i = 0; i < MAX_VARS; i++) {
+			if (strcmp(argv[1], shell_vars[i].name) == 0 && shell_vars[i].in_use) {
+				// 若变量 NAME 不是只读变量，则删除变量 NAME
+				if (!shell_vars[i].readonly) {
+					shell_vars[i].in_use = 0;
+				}
+
+				return 0;
+			}
+		}
+	}
 }
 
 void runcmd(char *s) {
