@@ -7,6 +7,9 @@
 u_int shell_envid; // 当前 shell 对应的进程 id
 int shell_id; // 当前 shell 对应的环境变量页面 id
 
+#define MAX_NAME_LEN 16
+#define MAX_VAL_LEN 16
+
 /* Overview:
  *   Parse the next token from the string at s.
  *
@@ -69,7 +72,7 @@ int gettoken(char *s, char **p1) {
 
 char *expand_var(const char *word) {
 	if (*word == '$') {
-		char ret[MAX_NAME_LEN + 1];
+		char ret[MAX_VAL_LEN + 1];
 		return syscall_get_env_var(ret, word + 1, shell_id);
 	}
 
@@ -243,9 +246,6 @@ void get_name_val(char *src, char *name, char *value) {
 		*value = '\0';
 	}
 }
-
-#define MAX_NAME_LEN 16
-#define MAX_VAL_LEN 16
 
 int declare(int argc, char *argv[]) {
 	if (argc == 1) {
