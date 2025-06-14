@@ -9,7 +9,7 @@ int rm(char *path, int mode) {
     struct Stat st;
     if (stat(path, &st) < 0) {
         if (mode) {
-            printf("rm: cannot remove '%s': No such file or directory", path);
+            printf("rm: cannot remove '%s': No such file or directory\n", path);
             return -1;
         } else {
             return 0;
@@ -30,15 +30,15 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[1], "-r") == 0) {
         return rm(argv[1], 1);
-    } else if (!strcmp(argv[1], "-rf") == 0){
+    } else if (strcmp(argv[1], "-rf") == 0){
         return rm(argv[1], 0);
     } else {
         if (stat(argv[1], &st) < 0) {
-            printf("rm: cannot remove '%s': No such file or directory", argv[1]);
+            printf("rm: cannot remove '%s': No such file or directory\n", argv[1]);
             return -1;
         }
         if (st.st_isdir) {
-            printf("rm: cannot remove '%s': Is a directory", argv[1]);
+            printf("rm: cannot remove '%s': Is a directory\n", argv[1]);
             return -1;
         }
         try(remove(argv[1]));
