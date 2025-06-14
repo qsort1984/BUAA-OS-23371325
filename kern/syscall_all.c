@@ -9,7 +9,6 @@
 
 extern struct Env *curenv;
 
-#include <printf.h>
 #include <string.h>
 
 #define MAX_VARS 128
@@ -102,7 +101,7 @@ int print_vars(int shell_id) {
 		if (env_vars[i].shell_id != shell_id && env_vars[i].shell_id != 0) {
 			continue;
 		}
-		printf("%s=%s\n", env_vars[i].name, env_vars[i].value);
+		printk("%s=%s\n", env_vars[i].name, env_vars[i].value);
 	}
 
 	return 0;
