@@ -70,11 +70,11 @@ int gettoken(char *s, char **p1) {
 	return c;
 }
 
-int expand_var(char *ret, const char *word) {
+int expand_var(char **ret, const char *word) {
 	if (*word == '$') {
 		try(syscall_get_env_var(ret, word + 1, shell_id));
 	} else {
-		ret = word;
+		*ret = word;
 	}
 
 	return 0;
@@ -96,9 +96,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
-			// try(expand_var(argv[argc++], t));
-			argv[argc++] = t;
-			break;
+			try(expand_var(&argv[argc++], t));
 		case '<':
 			if (gettoken(0, &t) != 'w') {
 				debugf("syntax error: < not followed by word\n");
