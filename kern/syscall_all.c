@@ -575,6 +575,26 @@ int sys_getcwd(char *buf) {
 	return 0;
 }
 
+int sys_shell_id_alloc() {
+	return alloc_shell_id();
+}
+
+int sys_declare_env_var(char *name, char *value, int shell_id, int readonly) {
+	return declare_env_var(name, value, shell_id, readonly);
+}
+
+int sys_unset_env_var(char *name, int shell_id) {
+	return unset_env_var(name, shell_id);
+}
+
+char *sys_get_env_var(char *name, int shell_id) {
+	return get_env_var(name, shell_id);
+}
+
+int sys_print_vars(int shell_id) {
+	return print_vars(shell_id);
+}
+
 void *syscall_table[MAX_SYSNO] = {
     [SYS_putchar] = sys_putchar,
     [SYS_print_cons] = sys_print_cons,
@@ -596,11 +616,11 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_read_dev] = sys_read_dev,
 	[SYS_chdir] = sys_chdir,
 	[SYS_getcwd] = sys_getcwd,
-	[SYS_shell_id_alloc] = alloc_shell_id,
-	[SYS_env_var_unset] = unset_env_var,
-	[SYS_print_vars] = print_vars,
-	[SYS_declare_env_var] = declare_env_var,
-	[SYS_get_env_var] = get_env_var,
+	[SYS_shell_id_alloc] = sys_shell_id_alloc,
+	[SYS_env_var_unset] = sys_unset_env_var,
+	[SYS_print_vars] = sys_print_vars,
+	[SYS_declare_env_var] = sys_declare_env_var,
+	[SYS_get_env_var] = sys_get_env_var,
 };
 
 /* Overview:

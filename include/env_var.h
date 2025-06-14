@@ -10,12 +10,12 @@ struct EnvVar {
     int in_use;    // 是否占用
 };
 
-int alloc_shell_id(void);
+int alloc_shell_id();
 
 int declare_env_var(char *name, char *value, int shell_id, int readonly);
 
 int unset_env_var(char *name, int shell_id);
 
-int get_env_var(char *name, int type, int shell_id);
+char *get_env_var(char *name, int shell_id);
 
 int print_vars(int shell_id);
