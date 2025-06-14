@@ -200,15 +200,15 @@ void runcmd(char *s) {
 			path = argv[1];
 
 			if (stat(path, &st) < 0) {
-				printf("cd: The directory '%s' does not exist\n", argv[1]);
+				debugf("cd: The directory '%s' does not exist\n", argv[1]);
 				return 1;
 			}
 			if (!st.st_isdir) {
-				printf("cd: '%s' is not a directory\n", argv[1]);
+				debugf("cd: '%s' is not a directory\n", argv[1]);
 				return 1;
 			}
 		} else {
-			printf("Too many args for cd command\n");
+			debugf("Too many args for cd command\n");
 			return 1;
 		}
 
@@ -218,9 +218,9 @@ void runcmd(char *s) {
 		if (argc == 1) {
 			char path[MAXPATHLEN];
 			getcwd(path);
-			printf("%s\n", path);
+			debugf("%s\n", path);
 		} else {
-			printf("pwd: expected 0 arguments; got %d\n", argc - 1);
+			debugf("pwd: expected 0 arguments; got %d\n", argc - 1);
 			return 2;
 		}
 
@@ -256,7 +256,7 @@ void readline(char *buf, u_int n) {
 				i = -1;
 			}
 			if (buf[i] != '\b') {
-				printf("\b");
+				debugf("\b");
 			}
 		}
 		if (buf[i] == '\r' || buf[i] == '\n') {
@@ -274,7 +274,7 @@ void readline(char *buf, u_int n) {
 char buf[1024];
 
 void usage(void) {
-	printf("usage: sh [-ix] [script-file]\n");
+	debugf("usage: sh [-ix] [script-file]\n");
 	exit();
 }
 
@@ -283,11 +283,11 @@ int main(int argc, char **argv) {
 	int interactive = iscons(0);
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
-	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
-	printf("::                                                         ::\n");
-	printf("::                     MOS Shell 2024                      ::\n");
-	printf("::                                                         ::\n");
-	printf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	debugf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+	debugf("::                                                         ::\n");
+	debugf("::                     MOS Shell 2024                      ::\n");
+	debugf("::                                                         ::\n");
+	debugf(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	ARGBEGIN {
 	case 'i':
 		interactive = 1;
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 	}
 	for (;;) {
 		if (interactive) {
-			printf("\n$ ");
+			debugf("\n$ ");
 		}
 		readline(buf, sizeof buf);
 
@@ -320,7 +320,7 @@ int main(int argc, char **argv) {
 			continue;
 		}
 		if (echocmds) {
-			printf("# %s\n", buf);
+			debugf("# %s\n", buf);
 		}
 		if ((r = fork()) < 0) {
 			user_panic("fork: %d", r);
