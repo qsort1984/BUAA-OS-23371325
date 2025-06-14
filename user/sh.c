@@ -87,7 +87,7 @@ int expand_var(char *buffer, const char *word) {
 			try(syscall_get_env_var(buffer, tmp, shell_id));
 			buffer += strlen(buffer);
 		} else {
-			*buffer++ = *word++
+			*buffer++ = *word++;
 		}
 	}
 	*buffer = '\0';
