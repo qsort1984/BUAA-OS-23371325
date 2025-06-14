@@ -3,8 +3,6 @@ INITAPPS +=
 
 USERLIB	+=
 
-USERAPPS += cd.b \
-			pwd.b \
-			touch.b \
+USERAPPS += touch.b \
 			rm.b \
 			mkdir.b
