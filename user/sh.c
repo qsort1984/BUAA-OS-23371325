@@ -74,11 +74,23 @@ int gettoken(char *s, char **p1) {
 }
 
 int expand_var(char *buffer, const char *word) {
-	if (*word == '$') {
-		try(syscall_get_env_var(buffer, word + 1, shell_id));
-	} else {
-		strcpy(buffer, word);
+	while (*word) {
+		if (*word == '$') {
+			int len = strlen(word);
+			char tmp[len + 1];
+			word++;
+			int i = 0;
+			while (*word && *word != '/') { // 判断条件应该为 *word 时标识符的组成部分 todo
+				tmp[i++] = *word++;
+			}
+			tmp[i] = '\0';
+			try(syscall_get_env_var(buffer, tmp, shell_id));
+			buffer += strlen(buffer);
+		} else {
+			*buffer++ = *word++
+		}
 	}
+	*buffer = '\0';
 
 	return 0;
 }
