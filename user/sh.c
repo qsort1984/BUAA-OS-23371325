@@ -272,17 +272,22 @@ int set_var(const char *name, const char *value, int local, int readonly) {
 
 void get_name_val(const char *src, char *name, char *value) {
 	char *p = src;
+	debugf("what happend?\n");
 	while (*p && *p != '=') {
 		*name++ = *p++;
 	}
+	debugf("what happend?\n");
 	*name = '\0';
 	if (*p) {
+		debugf("what happend?\n");
 		p++;
 		while (*p) {
 			*value++ = *p++;
 		}
+		debugf("what happend?\n");
 		*value = '\0'; 
 	} else {
+		debugf("what happend?\n");
 		*value = '\0';
 	}
 }
@@ -298,9 +303,7 @@ int declare(int argc, char *argv[]) {
 	} else {
 		char *name, *value;
 		if (strcmp(argv[1], "-x") == 0) {
-			debugf("what happend?\n");
 			get_name_val(argv[2], name, value);
-			debugf("what happend?\n");
 			try(set_var(name, value, 0, 0));
 		} else if (strcmp(argv[1], "-r") == 0) {
 			get_name_val(argv[2], name, value);
