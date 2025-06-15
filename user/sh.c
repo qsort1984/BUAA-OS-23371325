@@ -497,10 +497,10 @@ void readline(char *buf, u_int n) {
 					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 					strcpy(buf, history_buf[current_index]);
 					printf("%s", buf);
-					for (int j = max; j < strlen(buf); j++) {
+					for (int j = strlen(buf); j < max; j++) {
 						printf(" ");
 					}
-					for (int j = max; j < strlen(buf); j++) {
+					for (int j = strlen(buf); j < max; j++) {
 						printf("\b");
 					}
 					i = max = pointer = strlen(buf);
