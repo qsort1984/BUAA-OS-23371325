@@ -590,6 +590,7 @@ void readline(char *buf, u_int n) {
 			continue;
 		} else if (c == 23) {  // Ctrl-W
 			// Step 1: 跳过左侧空格
+			int cnt = 0;
 			while (pointer > 0 && (buf[pointer - 1] == ' ' || buf[pointer - 1] == '\t')) {
 				for (int j = pointer - 1; j < max - 1; j++) {
 					buf[j] = buf[j + 1];
@@ -604,6 +605,7 @@ void readline(char *buf, u_int n) {
 				for (int j = pointer; j <= max; j++) {
 					printf("\b");
 				}
+				cnt++;
 			}
 
 			// Step 2: 删除连续非空白字符
@@ -621,9 +623,10 @@ void readline(char *buf, u_int n) {
 				for (int j = pointer; j <= max; j++) {
 					printf("\b");
 				}
+				cnt++;
 			}
 
-			i--; // to change
+			i -= cnt + 1; // to change
 			continue;
 		}
 
