@@ -436,6 +436,8 @@ int runcmd(char *s) {
 
 void readline(char *buf, u_int n) {
 	int r;
+	int pointer = 0; //指向光标所在位置
+	int max = 0;
 	for (int i = 0; i < n; i++) {
 		if ((r = read(0, buf + i, 1)) != 1) {
 			if (r < 0) {
@@ -444,13 +446,38 @@ void readline(char *buf, u_int n) {
 			exit();
 		}
 		if (buf[i] == '\b' || buf[i] == 0x7f) {
-			if (i > 0) {
-				i -= 2;
-			} else {
-				i = -1;
-			}
-			if (buf[i] != '\b') {
-				printf("\b");
+			// backspacc : 删除光标左侧 1 个字符并将光标向左移动 1 列；若已在行首则无动作
+			// todo
+			// if (i > 0) {
+			// 	i -= 2;
+			// } else {
+			// 	i = -1;
+			// }
+			// if (buf[i] != '\b') {
+			// 	printf("\b");
+			// }
+			if (pointer != 0) {
+				for (int j = pointer - 1; j < max - 1; j++) {
+					buf[j] = buf[j + 1];
+				}
+				max--;
+				pointer--;
+
+				if (buf[i] != '\b') { 
+                    debugf("\b"); 
+                }
+
+				// 重写后续字符覆盖原字符
+				for (int j = pointer; j < max; j++) {
+					printf("%c", buf[j]);
+				}
+				printf(" ");
+
+				// 光标右移回去
+				for (int j = max; j > pointer; j--) {
+					printf("\b");
+				}
+				i--;
 			}
 		}
 		// 处理上下左右键
@@ -466,16 +493,30 @@ void readline(char *buf, u_int n) {
 				if (history_valid[current_index] && history_index != ((current_index + 1) % HISTORY_SIZE)) {
 					buf = history_buf[current_index];
 					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
+					// 移动光标
+					// todo
 				}
             } else if (buf[i] == 66) { // down
                 if (history_valid[current_index] && history_index != current_index) {
 					buf = history_buf[current_index];
 					current_index = (current_index + 1) % HISTORY_SIZE;
+					// 移动光标
+					// todo
 				}
             } else if (buf[i] == 67) { // right
-                
+                if (pointer < max) {
+                    pointer++;
+                } else {
+					// 输出退格抵消右移
+                    printf("\b");
+                }
             } else if (buf[i] == 68) { // left
-                
+                if (pointer != 0) {
+                    pointer--;
+                } else {
+					// 输出空格抵消左移
+                    printf(" ");
+                }
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
 			}
