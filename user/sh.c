@@ -456,7 +456,7 @@ void readline(char *buf, u_int n) {
 			// 	printf("\b");
 			// }
 			if (pointer != 0) {
-				for (int j = pointer - 1; j < max; j++) {
+				for (int j = pointer - 1; j < max - 1; j++) {
 					buf[j] = buf[j + 1];
 				}
 				max--;
