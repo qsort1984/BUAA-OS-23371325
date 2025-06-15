@@ -515,7 +515,7 @@ void readline(char *buf, u_int n) {
 				i = pointer - 1;
 				cache_buffer(buf + pointer, max - pointer);
             } else if (buf[i] == 68) { // left
-                if (pointer != 0) {
+                if (pointer > 0) {
 					pointer--;
                 } else {
 					printf(" "); // 前进一个抵消输入
@@ -538,6 +538,8 @@ void readline(char *buf, u_int n) {
         for (int j = 0; j < strlen(buffer_tmp); j++) {
             printf("\b");
         }
+		// 更新 buf
+		// todo
 		pointer++;
 		max++;
 	}
