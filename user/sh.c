@@ -493,7 +493,7 @@ void readline(char *buf, u_int n) {
 					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 				}
             } else if (c == 66) { // down
-			printf("%c%c%c", 27, 91, 65); // 上移一个抵消输入
+				// printf("%c%c%c", 27, 91, 65); 不需上移
                 if (history_valid[current_index] && history_index != current_index) {
 					// 移动光标
 					for (int j = 0; j < pointer; j++) {
