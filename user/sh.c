@@ -434,10 +434,20 @@ int runcmd(char *s) {
 	exit();
 }
 
+char buffer_tmp[1024];
+
+void cache_buffer(const char *start, int len) {
+	for (int i = 0; i < len; i++) {
+		buffer_tmp[i] = *(start + i);
+	}
+	buffer_tmp[len] = '\0';
+}
+
 void readline(char *buf, u_int n) {
 	int r;
 	int pointer = 0; // 指向光标所在位置
 	int max = 0; // 最大字符数
+	buffer_tmp[0] = '\0';
 	for (int i = 0; i < n; i++) {
 		if ((r = read(0, buf + i, 1)) != 1) {
 			if (r < 0) {
@@ -446,7 +456,7 @@ void readline(char *buf, u_int n) {
 			exit();
 		}
 		if (buf[i] == '\b' || buf[i] == 0x7f) {
-			// backspacc : 删除光标左侧 1个字符并将光标向左移动 1列；若已在行首则无动作
+			// backspace : 删除光标左侧 1个字符并将光标向左移动 1列；若已在行首则无动作
 			if (pointer != 0) {
 				for (int j = pointer - 1; j < max - 1; j++) {
 					buf[j] = buf[j + 1];
@@ -470,6 +480,7 @@ void readline(char *buf, u_int n) {
 			} else {
 				i--;
 			}
+			cache_buffer(buf + pointer, max - pointer);
 			continue;
 		}
 		// 处理上下左右键
@@ -497,20 +508,20 @@ void readline(char *buf, u_int n) {
 				}
             } else if (buf[i] == 67) { // right
                 if (pointer < max) {
-					// printf("%c", buf[pointer]);
-					// pointer++;
-					// i = pointer - 1;
+					pointer++;
                 } else {
 					printf("\b"); // 回退一格抵消输入
 				}
+				i = pointer - 1;
+				cache_buffer(buf + pointer, max - pointer);
             } else if (buf[i] == 68) { // left
                 if (pointer != 0) {
-					// printf("\b");
-					// pointer--;
-					// i = pointer - 1;
+					pointer--;
                 } else {
 					printf(" "); // 前进一个抵消输入
 				}
+				i = pointer - 1;
+				cache_buffer(buf + pointer, max - pointer);
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
 			}
@@ -521,18 +532,12 @@ void readline(char *buf, u_int n) {
 			return;
 		}
 		// 写入普通字符
-		// char tmp[128];
-        // strcpy(tmp, buf + pointer); //暂存指针之后所有内容
-        // buf1[pointer] = buf[i];
-        // pointer++;
-        // for (j = 0, k = pointer; j < strlen(tmp); j++, k++) {
-        //     debugf("%c", tmp[j]);
-        //     buf1[k] = tmp[j];
-        // }
-        // for (j = 0; j < strlen(tmp); j++) {
-        //     debugf("\b");
-        // }
-        // max++; //记录最大长度
+        for (int j = 0; j < strlen(buffer_tmp); j++) {
+            printf("%c", buffer_tmp[j]);
+        }
+        for (int j = 0; j < strlen(buffer_tmp); j++) {
+            printf("\b");
+        }
 		pointer++;
 		max++;
 	}
