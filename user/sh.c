@@ -518,7 +518,7 @@ void readline(char *buf, u_int n) {
                 if (pointer > 0) {
 					pointer--;
                 } else {
-					printf(" "); // 前进一个抵消输入
+					printf(" "); // 前进一格抵消输入
 				}
 				i = pointer - 1;
 				cache_buffer(buf + pointer, max - pointer);
@@ -532,12 +532,13 @@ void readline(char *buf, u_int n) {
 			return;
 		}
 		// 写入普通字符
-        for (int j = 0; j < strlen(buffer_tmp); j++) {
-            printf("%c", buffer_tmp[j]);
-        }
-        for (int j = 0; j < strlen(buffer_tmp); j++) {
-            printf("\b");
-        }
+        // for (int j = 0; j < strlen(buffer_tmp); j++) {
+        //     printf("%c", buffer_tmp[j]);
+        // }
+        // for (int j = 0; j < strlen(buffer_tmp); j++) {
+        //     printf("\b");
+        // }
+		printf("abcd\b\b\b\b");
 		// 更新 buf
 		// todo
 		pointer++;
