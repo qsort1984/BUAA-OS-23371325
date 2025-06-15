@@ -616,6 +616,20 @@ int main(int argc, char **argv) {
 			printf("# %s\n", buf);
 		}
 
+		if (strcmp(buf, "exit") == 0) {
+			// 条件判断不够严谨
+			break;  // 退出主 shell
+		}
+		if ((r = fork()) < 0) {
+			user_panic("fork: %d", r);
+		}
+		if (r == 0) {
+			runcmd(buf);
+			exit();
+		} else {
+			wait(r);
+		}
+
 		// 把命令写入history
 		if (strlen(buf) > 0) {
 			strcpy(history_buf[history_index], buf);
@@ -633,20 +647,6 @@ int main(int argc, char **argv) {
 				}
 			}
 			close(r);
-		}
-
-		if (strcmp(buf, "exit") == 0) {
-			// 条件判断不够严谨
-			break;  // 退出主 shell
-		}
-		if ((r = fork()) < 0) {
-			user_panic("fork: %d", r);
-		}
-		if (r == 0) {
-			runcmd(buf);
-			exit();
-		} else {
-			wait(r);
 		}
 	}
 	return 0;
