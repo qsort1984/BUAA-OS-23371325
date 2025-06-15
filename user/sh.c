@@ -434,6 +434,11 @@ int runcmd(char *s) {
 	exit();
 }
 
+void savecmd(char *buf) {
+	strcpy(history_buf[current_index], buf);
+	history_valid[current_index] = 1;
+}
+
 void readline(char *buf, u_int n) {
 	int r;
 	int pointer = 0; // 指向光标所在位置
@@ -482,27 +487,31 @@ void readline(char *buf, u_int n) {
             r = read(0, &c, 1);
             if (c == 65) { // up
 				printf("%c%c%c", 27, 91, 66); // 下移一个抵消输入
-				if (history_valid[current_index] && history_index != ((current_index + 1) % HISTORY_SIZE)) {
+				buf[max] = '\0';
+				savecmd(buf);
+				if (history_valid[(current_index + n - 1) % HISTORY_SIZE] && current_index_index != ((history_index + 1) % HISTORY_SIZE)) {
 					// 移动光标
 					for (int j = 0; j < pointer; j++) {
 						printf("\b");
 					}
+					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 					strcpy(buf, history_buf[current_index]);
 					printf("%s", buf);
 					i = max = pointer = strlen(buf);
-					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 				}
             } else if (c == 66) { // down
 				// printf("%c%c%c", 27, 91, 65); 不需上移
-                if (history_valid[current_index] && history_index != current_index) {
+				buf[max] = '\0';
+				savecmd(buf);
+                if (history_valid[(current_index + 1) % HISTORY_SIZE] && history_index != current_index) {
 					// 移动光标
 					for (int j = 0; j < pointer; j++) {
 						printf("\b");
 					}
+					current_index = (current_index + 1) % HISTORY_SIZE;
 					strcpy(buf, history_buf[current_index]);
 					printf("%s", buf);
 					i = max = pointer = strlen(buf);
-					current_index = (current_index + 1) % HISTORY_SIZE;
 				}
             } else if (c == 67) { // right
                 if (pointer < max) {
@@ -600,6 +609,7 @@ int main(int argc, char **argv) {
 			printf("\n$ ");
 		}
 		readline(buf, sizeof buf);
+		history_valid[history_index] = 0;
 
 		// 忽略注释
 		if (buf[0] == '#') {
@@ -632,10 +642,9 @@ int main(int argc, char **argv) {
 
 		// 把命令写入history
 		if (strlen(buf) > 0) {
-			strcpy(history_buf[history_index], buf);
-			history_valid[history_index] = 1;
-			current_index = history_index;
+			savecmd(buf);
 			history_index = (history_index + 1) % HISTORY_SIZE;
+			current_index = history_index;
 		}
 		if ((r = open("/.mos_history", O_RDWR)) < 0) {
 			user_panic("open /.mos_history: %d", r);
