@@ -11,8 +11,11 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 #define MAX_NAME_LEN 16
 #define MAX_VAL_LEN 16
 #define MAX_ARGV_LEN 1024
+#define HISTORY_SIZE 20
 
 char buffer[MAXARGS + 1][MAX_VAL_LEN + 1];
+char history_buf[20][1024];
+int history_index = 0;
 
 int runcmd(char *s);
 
@@ -454,7 +457,6 @@ int main(int argc, char **argv) {
 	shell_id = syscall_shell_id_alloc();
 	if ((r = open("/.mos_history", O_CREAT)) < 0) {
 		user_panic("open /.mos_history: %d", r);
-		user_assert(r == 0);
 	}
 	close(r);
 	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
@@ -500,9 +502,26 @@ int main(int argc, char **argv) {
 				break;
 			}
 		}
+
 		if (echocmds) {
 			printf("# %s\n", buf);
 		}
+
+		// 把命令写入history
+		if (strlen(buf) > 0) {
+			strcpy(history_buf[history_index], buf);
+			history_index = (history_index + 1) % HISTORY_SIZE;
+		}
+		if ((r = open("/.mos_history", O_RDWR)) < 0) {
+			user_panic("open /.mos_history: %d", r);
+		} else {
+			for (int i = 0; i < HISTORY_SIZE; i++) {
+				char *history_cmd = history_buf[(history_index + i) % HISTORY_SIZE];
+				fprintf(r, "%s\n", history_cmd);
+			}
+			close(r);
+		}
+
 		if (strcmp(buf, "exit") == 0) {
 			// 条件判断不够严谨
 			break;  // 退出主 shell
