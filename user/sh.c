@@ -455,26 +455,24 @@ void readline(char *buf, u_int n) {
 			// if (buf[i] != '\b') {
 			// 	printf("\b");
 			// }
-			printf("iiii\n");
 			if (pointer != 0) {
-				printf("iiii\n");
-				// for (int j = pointer - 1; j < max - 1; j++) {
-				// 	buf[j] = buf[j + 1];
-				// }
-				// max--;
-				// pointer--;
+				for (int j = pointer - 1; j < max - 1; j++) {
+					buf[j] = buf[j + 1];
+				}
+				max--;
+				pointer--;
                 printf("\b"); 
 
 				// 重写后续字符覆盖原字符
-				// for (int j = pointer; j < max; j++) {
-				// 	printf("%c", buf[j]);
-				// }
-				// printf(" ");
+				for (int j = pointer; j < max; j++) {
+					printf("%c", buf[j]);
+				}
+				printf(" ");
 
 				// 光标右移回去
-				// for (int j = max; j > pointer; j--) {
-				// 	printf("\b");
-				// }
+				for (int j = max; j > pointer; j--) {
+					printf("\b");
+				}
 				printf("\b");
 				i -= 2;
 			} else {
