@@ -497,16 +497,20 @@ void readline(char *buf, u_int n) {
 				}
             } else if (buf[i] == 67) { // right
                 if (pointer < max) {
-					printf("%c", buf[pointer]);
-					pointer++;
-					i = pointer - 1;
-                } 
+					// printf("%c", buf[pointer]);
+					// pointer++;
+					// i = pointer - 1;
+                } else {
+
+				}
             } else if (buf[i] == 68) { // left
                 if (pointer != 0) {
-					printf("\b");
-					pointer--;
-					i = pointer - 1;
-                }
+					// printf("\b");
+					// pointer--;
+					// i = pointer - 1;
+                } else {
+
+				}
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
 			}
