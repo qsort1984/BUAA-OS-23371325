@@ -112,6 +112,17 @@ int spawn(char *prog, char **argv) {
 	// Return the error if 'open' fails.
 	int fd;
 	if ((fd = open(prog, O_RDONLY)) < 0) {
+		char newprog[128];
+		int idx;
+		for (idx = 0; prog[idx]; idx++) {
+			newprog[idx] = prog[idx];
+		}
+		newprog[idx++] = '.';
+		newprog[idx++] = 'b';
+		newprog[idx++] = '\0';
+		fd = open(newprog, O_RDONLY);
+	}
+	if (fd < 0) {
 		return fd;
 	}
 
