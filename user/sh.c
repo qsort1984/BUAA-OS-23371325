@@ -156,7 +156,7 @@ int parsecmd(char **argv, int *rightpipe) {
 			// user_panic("> redirection not implemented");
 
 			break;
-		case '|':;
+		case '|':
 			/*
 			 * First, allocate a pipe.
 			 * Then fork, set '*rightpipe' to the returned child envid or zero.
@@ -196,10 +196,19 @@ int parsecmd(char **argv, int *rightpipe) {
 				close(p[0]);
 				return argc;
 			}
-
-			// user_panic("| not implemented");
-
 			break;
+		case ';':
+			// 新建子进程执行;前的指令，父进程等待子进程执行完毕
+			if ((r = fork()) < 0) { 
+				debugf("fork: %d\n", r);
+				exit();
+			}
+			if (r == 0) {
+				return argc;
+			} else {
+				wait(r);
+				return parsecmd(argv, rightpipe);
+			}
 		}
 	}
 
@@ -298,6 +307,17 @@ int unset(int argc, char *argv[]) {
 	return 0;
 }
 
+int history(int argc) {
+	if (argc == 1) {
+		// todo
+	} else {
+		debugf("history: expected 0 arguments; got %d\n", argc - 1);
+		return 2;
+	}
+
+	return 0;
+}
+
 int runcmd(char *s) {
 	gettoken(s, 0);
 
@@ -318,6 +338,8 @@ int runcmd(char *s) {
 		return declare(argc, argv);
 	} else if (strcmp(argv[0], "unset") == 0) {
 		return unset(argc, argv);
+	} else if (strcmp(argv[0], "history") == 0) {
+		return history(argc);
 	}
 
 	int child = spawn(argv[0], argv);
