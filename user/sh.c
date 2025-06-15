@@ -408,6 +408,7 @@ int runcmd(char *s) {
 }
 
 void readline(char *buf, u_int n) {
+	// todo
 	int r;
 	for (int i = 0; i < n; i++) {
 		if ((r = read(0, buf + i, 1)) != 1) {
@@ -451,6 +452,11 @@ int main(int argc, char **argv) {
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
 	shell_id = syscall_shell_id_alloc();
+	if ((r = open("/.mos_history", O_CREAT)) < 0) {
+		user_panic("open /.mos_history: %d", r);
+		user_assert(r == 0);
+	}
+	close(r);
 	printf("\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
 	printf("::                                                         ::\n");
 	printf("::                     MOS Shell 2024                      ::\n");
