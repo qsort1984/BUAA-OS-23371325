@@ -532,10 +532,11 @@ void readline(char *buf, u_int n) {
 			return;
 		}
 		// 写入普通字符
-        printf("%s", buffer_tmp);
+        printf("%s %d", buffer_tmp, strlen(buffer_tmp));
         for (int j = 0; j < strlen(buffer_tmp); j++) {
             printf("\b");
         }
+		printf("\b\b");
 		// 更新 buf
 		// todo
 		pointer++;
