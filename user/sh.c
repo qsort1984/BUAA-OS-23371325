@@ -707,6 +707,24 @@ int main(int argc, char **argv) {
 		history_valid[history_index] = 0;
 		current_index = history_index;
 
+		// 把命令写入history
+		if (strlen(buf) > 0) {
+			savecmd(buf);
+			history_index = (history_index + 1) % HISTORY_SIZE;
+			current_index = history_index;
+		}
+		if ((r = open("/.mos_history", O_RDWR)) < 0) {
+			user_panic("open /.mos_history: %d", r);
+		} else {
+			for (int i = 0; i < HISTORY_SIZE; i++) {
+				char *tmp = history_buf[(history_index + i) % HISTORY_SIZE];
+				if (history_valid[(history_index + i) % HISTORY_SIZE]) {
+					fprintf(r, "%s\n", tmp);
+				}
+			}
+			close(r);
+		}
+
 		// 忽略注释
 		if (buf[0] == '#') {
 			continue;
@@ -734,24 +752,6 @@ int main(int argc, char **argv) {
 			exit();
 		} else {
 			wait(r);
-		}
-
-		// 把命令写入history
-		if (strlen(buf) > 0) {
-			savecmd(buf);
-			history_index = (history_index + 1) % HISTORY_SIZE;
-			current_index = history_index;
-		}
-		if ((r = open("/.mos_history", O_RDWR)) < 0) {
-			user_panic("open /.mos_history: %d", r);
-		} else {
-			for (int i = 0; i < HISTORY_SIZE; i++) {
-				char *tmp = history_buf[(history_index + i) % HISTORY_SIZE];
-				if (history_valid[(history_index + i) % HISTORY_SIZE]) {
-					fprintf(r, "%s\n", tmp);
-				}
-			}
-			close(r);
 		}
 	}
 	return 0;
