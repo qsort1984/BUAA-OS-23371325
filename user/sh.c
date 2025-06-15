@@ -497,6 +497,12 @@ void readline(char *buf, u_int n) {
 					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 					strcpy(buf, history_buf[current_index]);
 					printf("%s", buf);
+					for (int j = max; j < strlen(buf); j++) {
+						printf(" ");
+					}
+					for (int j = max; j < strlen(buf); j++) {
+						printf("\b");
+					}
 					i = max = pointer = strlen(buf);
 				}
             } else if (c == 66) { // down
@@ -511,6 +517,12 @@ void readline(char *buf, u_int n) {
 					current_index = (current_index + 1) % HISTORY_SIZE;
 					strcpy(buf, history_buf[current_index]);
 					printf("%s", buf);
+					for (int j = max; j < strlen(buf); j++) {
+						printf(" ");
+					}
+					for (int j = max; j < strlen(buf); j++) {
+						printf("\b");
+					}
 					i = max = pointer = strlen(buf);
 				}
             } else if (c == 67) { // right
