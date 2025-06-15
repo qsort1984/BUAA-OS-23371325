@@ -489,7 +489,7 @@ void readline(char *buf, u_int n) {
 				printf("%c%c%c", 27, 91, 66); // 下移一个抵消输入
 				buf[max] = '\0';
 				savecmd(buf);
-				if (history_valid[(current_index + n - 1) % HISTORY_SIZE] && current_index_index != ((history_index + 1) % HISTORY_SIZE)) {
+				if (history_valid[(current_index + n - 1) % HISTORY_SIZE] && current_index != ((history_index + 1) % HISTORY_SIZE)) {
 					// 移动光标
 					for (int j = 0; j < pointer; j++) {
 						printf("\b");
