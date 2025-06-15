@@ -447,14 +447,6 @@ void readline(char *buf, u_int n) {
 		}
 		if (buf[i] == '\b' || buf[i] == 0x7f) {
 			// backspacc : 删除光标左侧 1个字符并将光标向左移动 1列；若已在行首则无动作
-			// if (i > 0) {
-			// 	i -= 2;
-			// } else {
-			// 	i = -1;
-			// }
-			// if (buf[i] != '\b') {
-			// 	printf("\b");
-			// }
 			if (pointer != 0) {
 				for (int j = pointer - 1; j < max - 1; j++) {
 					buf[j] = buf[j + 1];
@@ -478,6 +470,7 @@ void readline(char *buf, u_int n) {
 			} else {
 				i--;
 			}
+			continue;
 		}
 		// 处理上下左右键
 		if (buf[i] == 27) {
@@ -504,17 +497,15 @@ void readline(char *buf, u_int n) {
 				}
             } else if (buf[i] == 67) { // right
                 if (pointer < max) {
-                    pointer++;
-                } else {
-					// 输出退格抵消右移
-                    printf("\b");
-                }
+					printf("%c", buf[pointer]);
+					pointer++;
+					i = pointer - 1;
+                } 
             } else if (buf[i] == 68) { // left
                 if (pointer != 0) {
-                    pointer--;
-                } else {
-					// 输出空格抵消左移
-                    printf(" ");
+					printf("\b");
+					pointer--;
+					i = pointer - 1;
                 }
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
@@ -525,6 +516,19 @@ void readline(char *buf, u_int n) {
 			buf[i] = 0;
 			return;
 		}
+		// 写入普通字符
+		// char tmp[128];
+        // strcpy(tmp, buf + pointer); //暂存指针之后所有内容
+        // buf1[pointer] = buf[i];
+        // pointer++;
+        // for (j = 0, k = pointer; j < strlen(tmp); j++, k++) {
+        //     debugf("%c", tmp[j]);
+        //     buf1[k] = tmp[j];
+        // }
+        // for (j = 0; j < strlen(tmp); j++) {
+        //     debugf("\b");
+        // }
+        // max++; //记录最大长度
 		pointer++;
 		max++;
 	}
