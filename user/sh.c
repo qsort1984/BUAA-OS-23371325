@@ -445,7 +445,7 @@ void readline(char *buf, u_int n) {
 			}
 			exit();
 		}
-		if (buf[i] == '\b') {
+		if (buf[i] == '\b' || buf[i] == 0x7f) {
 			// backspacc : 删除光标左侧 1个字符并将光标向左移动 1列；若已在行首则无动作
 			// if (i > 0) {
 			// 	i -= 2;
@@ -480,9 +480,6 @@ void readline(char *buf, u_int n) {
 			} else {
 				i--;
 			}
-		}
-		if (buf[i] == 0x7f) {
-
 		}
 		// 处理上下左右键
 		if (buf[i] == 27) {
