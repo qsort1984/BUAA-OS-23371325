@@ -434,15 +434,6 @@ int runcmd(char *s) {
 	exit();
 }
 
-// char buffer_tmp[1024];
-
-// void cache_buffer(const char *start, int len) {
-// 	for (int i = 0; i < len; i++) {
-// 		buffer_tmp[i] = *(start + i);
-// 	}
-// 	buffer_tmp[len] = '\0';
-// }
-
 void readline(char *buf, u_int n) {
 	int r;
 	int pointer = 0; // 指向光标所在位置
@@ -490,18 +481,28 @@ void readline(char *buf, u_int n) {
 			}
             r = read(0, &c, 1);
             if (c == 65) { // up
+				printf("%c%c%c", 27, 91, 66); // 下移一个抵消输入
 				if (history_valid[current_index] && history_index != ((current_index + 1) % HISTORY_SIZE)) {
-					buf = history_buf[current_index];
-					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 					// 移动光标
-					// todo
+					for (int j = 0; j < pointer; j++) {
+						printf("\b");
+					}
+					strcpy(buf, history_buf[current_index]);
+					printf("%s", buf);
+					i = max = pointer = strlen(buf);
+					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 				}
             } else if (c == 66) { // down
+			printf("%c%c%c", 27, 91, 65); // 上移一个抵消输入
                 if (history_valid[current_index] && history_index != current_index) {
-					buf = history_buf[current_index];
-					current_index = (current_index + 1) % HISTORY_SIZE;
 					// 移动光标
-					// todo
+					for (int j = 0; j < pointer; j++) {
+						printf("\b");
+					}
+					strcpy(buf, history_buf[current_index]);
+					printf("%s", buf);
+					i = max = pointer = strlen(buf);
+					current_index = (current_index + 1) % HISTORY_SIZE;
 				}
             } else if (c == 67) { // right
                 if (pointer < max) {
