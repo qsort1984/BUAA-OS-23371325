@@ -526,6 +526,8 @@ void readline(char *buf, u_int n) {
 			buf[i] = 0;
 			return;
 		}
+		pointer++;
+		max++;
 	}
 	debugf("line too long\n");
 	while ((r = read(0, buf, 1)) == 1 && buf[0] != '\r' && buf[0] != '\n') {
