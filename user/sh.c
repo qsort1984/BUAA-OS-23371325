@@ -501,7 +501,7 @@ void readline(char *buf, u_int n) {
 					// pointer++;
 					// i = pointer - 1;
                 } else {
-
+					printf("\b"); // 回退一格抵消输入
 				}
             } else if (buf[i] == 68) { // left
                 if (pointer != 0) {
@@ -509,7 +509,7 @@ void readline(char *buf, u_int n) {
 					// pointer--;
 					// i = pointer - 1;
                 } else {
-
+					printf(" "); // 前进一个抵消输入
 				}
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
