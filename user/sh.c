@@ -387,7 +387,7 @@ int history(int argc, char **argv) {
 		// if (rightpipe) {
 		// 	wait(rightpipe);
 		// }
-		argv[0] = "cat.b";
+		argv[0] = "/cat.b";
 		argv[1] = "/.mosh_history";
 	} else {
 		debugf("history: expected 0 arguments; got %d\n", argc - 1);
