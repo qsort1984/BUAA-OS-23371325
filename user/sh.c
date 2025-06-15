@@ -10,6 +10,7 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 
 #define MAX_NAME_LEN 16
 #define MAX_VAL_LEN 16
+#define MAX_ARGV_LEN 1024
 
 char buffer[MAXARGS + 1][MAX_VAL_LEN + 1];
 
@@ -73,6 +74,43 @@ int gettoken(char *s, char **p1) {
 	return c;
 }
 
+int run_command_and_capture_output(const char *cmd, char *output) {
+    int p[2];
+	int r = pipe(p);
+    if (r != 0) {
+        debugf("pipe: %d\n", r);
+		exit();
+    }
+
+	r = fork();
+	if (r < 0) {
+		debugf("fork: %d\n", r);
+		exit();
+	}
+
+	if (r == 0) {
+		// 子进程
+        close(p[0]);  // 关闭读端
+        dup(p[1], 1); // stdout -> pipe写端
+        close(p[1]);
+        runcmd(tmp);
+        exit();
+	} else {
+		// 父进程
+		close(p[1]);  // 关闭写端
+		int n = read(p[0], output, MAX_ARGV_LEN - 1);
+		if (n >= 0) {
+			output[n] = '\0';
+		} else {
+			output[0] = '\0';
+		}
+		close(p[0]);
+		wait(r);
+	}
+
+    return 0;
+}
+
 int expand_var(char *buffer, const char *word) {
 	while (*word) {
 		if (*word == '$') {
@@ -85,6 +123,18 @@ int expand_var(char *buffer, const char *word) {
 			}
 			tmp[i] = '\0';
 			try(syscall_get_env_var(buffer, tmp, shell_id));
+			buffer += strlen(buffer);
+		} else if (*word == '`') {
+			char tmp[MAX_ARGV_LEN];
+			char *q = tmp;
+			while (*word) {
+				if (*word != '`') {
+					*q++ = *word;
+				}
+				word++;
+			}
+			*q = '\0';
+			try(run_command_and_capture_output(tmp, buffer));
 			buffer += strlen(buffer);
 		} else {
 			*buffer++ = *word++;
