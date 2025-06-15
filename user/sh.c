@@ -461,7 +461,6 @@ void readline(char *buf, u_int n) {
 				}
 				max--;
 				pointer--;
-			
                 printf("\b"); 
 
 				// 重写后续字符覆盖原字符
@@ -475,6 +474,8 @@ void readline(char *buf, u_int n) {
 					printf("\b");
 				}
 				printf("\b");
+				i -= 2;
+			} else {
 				i--;
 			}
 		}
