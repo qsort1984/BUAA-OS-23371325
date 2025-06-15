@@ -14,8 +14,10 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 #define HISTORY_SIZE 20
 
 char buffer[MAXARGS + 1][MAX_VAL_LEN + 1];
-char history_buf[20][1024];
+char history_buf[HISTORY_SIZE][MAX_ARGV_LEN];
+int history_valid[HISTORY_SIZE];
 int history_index = 0;
+int current_index = 0;
 
 int runcmd(char *s);
 
@@ -362,9 +364,31 @@ int unset(int argc, char *argv[]) {
 	return 0;
 }
 
-int history(int argc) {
+int history(int argc, char **argv) {
 	if (argc == 1) {
 		// todo
+		// int r, fd;
+		// if ((fd = open("/.mosh_history", O_RDONLY)) < 0) {
+		// 	debugf("open /.mos_history: %d", r);
+		// 	return 1;
+		// }
+		// char history_buf[MAX_ARGV_LEN];
+		// for (int i = 0; i < MAX_ARGV_LEN; i++) {
+		// 	if ((r = read(fd, history_buf + i, 1)) != 1) {
+		// 		if (r < 0) {
+		// 			debugf("read error: %d\n", r);
+		// 		}
+		// 		break;
+		// 	}
+		// }
+		// printf("%s", history_buf);
+		// close(fd);
+		// close_all();
+		// if (rightpipe) {
+		// 	wait(rightpipe);
+		// }
+		argv[0] = "cat.b";
+		argv[1] = "/.mosh_history";
 	} else {
 		debugf("history: expected 0 arguments; got %d\n", argc - 1);
 		return 2;
@@ -394,7 +418,7 @@ int runcmd(char *s) {
 	} else if (strcmp(argv[0], "unset") == 0) {
 		return unset(argc, argv);
 	} else if (strcmp(argv[0], "history") == 0) {
-		return history(argc);
+		try(history(argc, argv));
 	}
 
 	int child = spawn(argv[0], argv);
@@ -411,7 +435,6 @@ int runcmd(char *s) {
 }
 
 void readline(char *buf, u_int n) {
-	// todo
 	int r;
 	for (int i = 0; i < n; i++) {
 		if ((r = read(0, buf + i, 1)) != 1) {
@@ -429,6 +452,34 @@ void readline(char *buf, u_int n) {
 			if (buf[i] != '\b') {
 				printf("\b");
 			}
+		}
+		// 处理上下左右键
+		if (buf[i] == 27) {
+			i++;
+            r = read(0, buf + i, 1);
+			if (buf[i] != 91) {
+				debugf("unkonwn char: %c\n", buf[i]);
+			}
+            i++;
+            r = read(0, buf + i, 1);
+            if (buf[i] == 65) { // up
+				if (history_valid[current_index] && history_index != ((current_index + 1) % HISTORY_SIZE)) {
+					buf = history_buf[current_index];
+					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
+				}
+            } else if (buf[i] == 66) { // down
+                if (history_valid[current_index] && history_index != current_index) {
+					buf = history_buf[current_index];
+					current_index = (current_index + 1) % HISTORY_SIZE;
+				}
+            } else if (buf[i] == 67) { // right
+                
+            } else if (buf[i] == 68) { // left
+                
+            } else {
+				debugf("unkonwn char: %c\n", buf[i]);
+			}
+            continue;
 		}
 		if (buf[i] == '\r' || buf[i] == '\n') {
 			buf[i] = 0;
@@ -510,14 +561,18 @@ int main(int argc, char **argv) {
 		// 把命令写入history
 		if (strlen(buf) > 0) {
 			strcpy(history_buf[history_index], buf);
+			history_valid[history_index] = 1;
+			current_index = history_index;
 			history_index = (history_index + 1) % HISTORY_SIZE;
 		}
 		if ((r = open("/.mos_history", O_RDWR)) < 0) {
 			user_panic("open /.mos_history: %d", r);
 		} else {
 			for (int i = 0; i < HISTORY_SIZE; i++) {
-				char *history_cmd = history_buf[(history_index + i) % HISTORY_SIZE];
-				fprintf(r, "%s\n", history_cmd);
+				char *tmp = history_buf[(history_index + i) % HISTORY_SIZE];
+				if (history_valid[(history_index + i) % HISTORY_SIZE]) {
+					fprintf(r, "%s\n", tmp);
+				}
 			}
 			close(r);
 		}
