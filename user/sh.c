@@ -467,7 +467,7 @@ void readline(char *buf, u_int n) {
 				// for (int j = pointer; j < max; j++) {
 				// 	printf("%c", buf[j]);
 				// }
-				printf(" ");
+				// printf(" ");
 
 				// 光标右移回去
 				// for (int j = max; j > pointer; j--) {
