@@ -544,6 +544,89 @@ void readline(char *buf, u_int n) {
 			}
             continue;
 		}
+		// 处理快捷键
+		if (c == 1) {  // Ctrl-A
+			while (pointer > 0) {
+				printf("\b");
+				pointer--;
+			}
+			i--;
+			continue;
+		} else if (c == 5) {  // Ctrl-E
+			while (pointer < max) {
+				printf("%c", buf[pointer]);
+				pointer++;
+			}
+			i--;
+			continue;
+		} else if (c == 11) {  // Ctrl-K
+			for (int j = pointer; j < max; j++) {
+				printf(" ");
+			}
+			for (int j = pointer; j < max; j++) {
+				printf("\b");
+			}
+			max = pointer;
+			i = pointer - 1;
+			continue;
+		} else if (c == 21) {  // Ctrl-U
+			// 删除从行首到光标前
+			while (pointer > 0) {
+				for (int j = 0; j < max - 1; j++) {
+					buf[j] = buf[j + 1];
+				}
+				max--;
+				pointer--;
+				printf("\b");
+				for (int j = pointer; j < max; j++) {
+					printf("%c", buf[j]);
+				}
+				printf(" ");
+				for (int j = pointer; j <= max; j++) {
+					printf("\b");
+				}
+			}
+			i = max - 1;
+			continue;
+		} else if (c == 23) {  // Ctrl-W
+			// Step 1: 跳过左侧空格
+			while (pointer > 0 && (buf[pointer - 1] == ' ' || buf[pointer - 1] == '\t')) {
+				for (int j = pointer - 1; j < max - 1; j++) {
+					buf[j] = buf[j + 1];
+				}
+				pointer--;
+				max--;
+				printf("\b");
+				for (int j = pointer; j < max; j++) {
+					printf("%c", buf[j]);
+				}
+				printf(" ");
+				for (int j = pointer; j <= max; j++) {
+					printf("\b");
+				}
+			}
+
+			// Step 2: 删除连续非空白字符
+			while (pointer > 0 && buf[pointer - 1] != ' ' && buf[pointer - 1] != '\t') {
+				for (int j = pointer - 1; j < max - 1; j++) {
+					buf[j] = buf[j + 1];
+				}
+				pointer--;
+				max--;
+				printf("\b");
+				for (int j = pointer; j < max; j++) {
+					printf("%c", buf[j]);
+				}
+				printf(" ");
+				for (int j = pointer; j <= max; j++) {
+					printf("\b");
+				}
+			}
+
+			i--;
+			continue;
+		}
+
 		if (c == '\r' || c == '\n') {
 			buf[max] = 0;
 			return;
