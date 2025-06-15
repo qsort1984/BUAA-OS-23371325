@@ -623,7 +623,7 @@ void readline(char *buf, u_int n) {
 				}
 			}
 
-			i--;
+			i--; // to change
 			continue;
 		}
 
@@ -705,6 +705,7 @@ int main(int argc, char **argv) {
 		}
 		readline(buf, sizeof buf);
 		history_valid[history_index] = 0;
+		current_index = history_index;
 
 		// 忽略注释
 		if (buf[0] == '#') {
