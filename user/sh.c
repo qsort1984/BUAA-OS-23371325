@@ -14,6 +14,8 @@ int shell_id; // 当前 shell 对应的环境变量页面 id
 
 char buffer[MAXARGS + 1][MAX_VAL_LEN + 1];
 
+int runcmd(char *s);
+
 /* Overview:
  *   Parse the next token from the string at s.
  *
@@ -93,7 +95,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
         close(p[0]);  // 关闭读端
         dup(p[1], 1); // stdout -> pipe写端
         close(p[1]);
-        runcmd(tmp);
+        runcmd(cmd);
         exit();
 	} else {
 		// 父进程
