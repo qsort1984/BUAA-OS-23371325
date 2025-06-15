@@ -434,28 +434,28 @@ int runcmd(char *s) {
 	exit();
 }
 
-char buffer_tmp[1024];
+// char buffer_tmp[1024];
 
-void cache_buffer(const char *start, int len) {
-	for (int i = 0; i < len; i++) {
-		buffer_tmp[i] = *(start + i);
-	}
-	buffer_tmp[len] = '\0';
-}
+// void cache_buffer(const char *start, int len) {
+// 	for (int i = 0; i < len; i++) {
+// 		buffer_tmp[i] = *(start + i);
+// 	}
+// 	buffer_tmp[len] = '\0';
+// }
 
 void readline(char *buf, u_int n) {
 	int r;
 	int pointer = 0; // 指向光标所在位置
 	int max = 0; // 最大字符数
-	buffer_tmp[0] = '\0';
+	char c; // 从标准输入中读取的字符
 	for (int i = 0; i < n; i++) {
-		if ((r = read(0, buf + i, 1)) != 1) {
+		if ((r = read(0, &c, 1)) != 1) {
 			if (r < 0) {
 				debugf("read error: %d\n", r);
 			}
 			exit();
 		}
-		if (buf[i] == '\b' || buf[i] == 0x7f) {
+		if (c == '\b' || c == 0x7f) {
 			// backspace : 删除光标左侧 1个字符并将光标向左移动 1列；若已在行首则无动作
 			if (pointer != 0) {
 				for (int j = pointer - 1; j < max - 1; j++) {
@@ -480,70 +480,71 @@ void readline(char *buf, u_int n) {
 			} else {
 				i--;
 			}
-			cache_buffer(buf + pointer, max - pointer);
 			continue;
 		}
 		// 处理上下左右键
-		if (buf[i] == 27) {
-			i++;
-            r = read(0, buf + i, 1);
-			if (buf[i] != 91) {
-				debugf("unkonwn char: %c\n", buf[i]);
+		if (c == 27) {
+            r = read(0, &c, 1);
+			if (c != 91) {
+				debugf("unkonwn char: %c\n", c);
 			}
-            i++;
-            r = read(0, buf + i, 1);
-            if (buf[i] == 65) { // up
+            r = read(0, &c, 1);
+            if (c == 65) { // up
 				if (history_valid[current_index] && history_index != ((current_index + 1) % HISTORY_SIZE)) {
 					buf = history_buf[current_index];
 					current_index = (current_index + HISTORY_SIZE - 1) % HISTORY_SIZE;
 					// 移动光标
 					// todo
 				}
-            } else if (buf[i] == 66) { // down
+            } else if (c == 66) { // down
                 if (history_valid[current_index] && history_index != current_index) {
 					buf = history_buf[current_index];
 					current_index = (current_index + 1) % HISTORY_SIZE;
 					// 移动光标
 					// todo
 				}
-            } else if (buf[i] == 67) { // right
+            } else if (c == 67) { // right
                 if (pointer < max) {
 					pointer++;
                 } else {
 					printf("\b"); // 回退一格抵消输入
 				}
-				i = pointer - 1;
-				cache_buffer(buf + pointer, max - pointer);
-            } else if (buf[i] == 68) { // left
+				i--;
+            } else if (c == 68) { // left
                 if (pointer > 0) {
 					pointer--;
                 } else {
 					printf(" "); // 前进一格抵消输入
 				}
-				i = pointer - 1;
-				cache_buffer(buf + pointer, max - pointer);
+				i--;
             } else {
 				debugf("unkonwn char: %c\n", buf[i]);
 			}
             continue;
 		}
-		if (buf[i] == '\r' || buf[i] == '\n') {
-			buf[i] = 0;
+		if (c == '\r' || c == '\n') {
+			buf[max] = 0;
 			return;
 		}
 		// 写入普通字符
-        printf("%s %d", buffer_tmp, strlen(buffer_tmp));
-        for (int j = 0; j < strlen(buffer_tmp); j++) {
-            printf("\b");
-        }
-		printf("\b\b");
+		// 更新显示界面
+		for (int j = pointer; j < max; j++) {
+			printf("%c", buf[j]);
+		}
+		for (int j = pointer; j < max; j++) {
+			printf("\b");
+		}
 		// 更新 buf
-		// todo
+		for (int j = max; j > pointer; j--) {
+			buf[j] = buf[j - 1];
+		}
+		buf[pointer] = c;
 		pointer++;
 		max++;
 	}
 	debugf("line too long\n");
-	while ((r = read(0, buf, 1)) == 1 && buf[0] != '\r' && buf[0] != '\n') {
+	// 读取完剩余的字符
+	while ((r = read(0, &c, 1)) == 1 && c != '\r' && c != '\n') {
 		;
 	}
 	buf[0] = 0;
