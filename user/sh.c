@@ -51,14 +51,16 @@ int _gettoken(char *s, char **p1, char **p2) {
 	}
 
 	// 识别反引号括起的内容
+	// 反引号也要被视为一部分
+	// todo
 	if (*s == '`') {
-		s++;
 		*p1 = s;
+		s++;
 		while (*s && *s != '`') {
 			s++;
 		}
 		if (*s == '`') {
-			*s++ = 0;
+			s++;
 		}
 		*p2 = s;
 		return 'w';
