@@ -151,11 +151,8 @@ int expand_var(char *buffer, const char *word) {
 		} else if (*word == '`') {
 			char tmp[MAX_ARGV_LEN];
 			char *q = tmp;
-			while (*word) {
-				if (*word != '`') {
-					*q++ = *word;
-				}
-				word++;
+			while (*word && *word != '`') {
+				*q++ = *word++;
 			}
 			*q = '\0';
 			try(run_command_and_capture_output(tmp, buffer));
