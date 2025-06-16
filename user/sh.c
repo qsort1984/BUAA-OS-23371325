@@ -146,7 +146,7 @@ int expand_var(char *buffer, const char *word) {
 				tmp[i++] = *word++;
 			}
 			tmp[i] = '\0';
-			chat buffer_tmp[MAX_ARGV_LEN];
+			char buffer_tmp[MAX_ARGV_LEN];
 			try(syscall_get_env_var(buffer_tmp, tmp, shell_id));
 			strcpy(buffer, buffer_tmp);
 			buffer += strlen(buffer_tmp);
