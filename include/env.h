@@ -42,6 +42,7 @@ struct Env {
 
 	// Lab 6-shell
 	char env_cwd[1024]; // MAXPATHLEN = 1024
+	int env_exit_status;
 };
 
 LIST_HEAD(Env_list, Env);

@@ -106,3 +106,11 @@ int syscall_get_env_var(char *ret, char *name, int shell_id) {
 u_int syscall_get_parent_id(void) {
 	return msyscall(SYS_get_parent_id);
 }
+
+int syscall_exit(int exit_status) {
+	return msyscall(SYS_exit, exit_status);
+}
+
+int syscall_get_exit_status(u_int envid) {
+	return msyscall(SYS_get_exit_status, envid);
+}

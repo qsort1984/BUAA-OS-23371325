@@ -30,6 +30,8 @@ enum {
 	SYS_declare_env_var,
 	SYS_get_env_var,
 	SYS_get_parent_id,
+	SYS_exit,
+	SYS_get_exit_status,
 	MAX_SYSNO,
 };
 

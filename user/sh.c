@@ -336,7 +336,7 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				// child_tag = 0;
 				wait(r);
-				int result = ipc_recv(NULL, 0, 0);
+				int result = wait(r);
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
 				// } else if (*rightpipe == 1) {
@@ -369,7 +369,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				// child_tag = 1;
 				return argc;
 			} else {
-				int result = ipc_recv(NULL, 0, 0);
+				int result = wait(r);
 				// child_tag = 0;
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);

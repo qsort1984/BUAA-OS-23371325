@@ -679,6 +679,17 @@ int sys_getcwd(char *buf) {
 	return 0;
 }
 
+int sys_exit(int exit_status) {
+	curenv->env_exit_status = exit_status;
+	return 0;
+}
+
+int sys_get_exit_status(u_int envid) {
+	struct Env *e;
+	envid2env(envid, &e, 0);
+	return e->env_exit_status;
+}
+
 void *syscall_table[MAX_SYSNO] = {
     [SYS_putchar] = sys_putchar,
     [SYS_print_cons] = sys_print_cons,
@@ -706,6 +717,8 @@ void *syscall_table[MAX_SYSNO] = {
 	[SYS_declare_env_var] = sys_declare_env_var,
 	[SYS_get_env_var] = sys_get_env_var,
 	[SYS_get_parent_id] = sys_get_parent_id,
+	[SYS_exit] = sys_exit,
+	[SYS_get_exit_status] = sys_get_exit_status,
 };
 
 /* Overview:

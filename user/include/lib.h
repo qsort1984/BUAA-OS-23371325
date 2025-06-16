@@ -78,13 +78,15 @@ int syscall_print_vars(int shell_id);
 int syscall_declare_env_var(char *name, char *value, int shell_id, int readonly);
 int syscall_get_env_var(char *ret, char *name, int shell_id);
 u_int syscall_get_parent_id(void);
+int syscall_exit(int exit_status);
+int syscall_get_exit_status(u_int envid);
 
 // ipc.c
 void ipc_send(u_int whom, u_int val, const void *srcva, u_int perm);
 u_int ipc_recv(u_int *whom, void *dstva, u_int *perm);
 
 // wait.c
-void wait(u_int envid);
+int wait(u_int envid);
 
 // console.c
 int opencons(void);
