@@ -335,6 +335,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				return argc;
 			} else {
 				// child_tag = 0;
+				wait(r);
 				int result = ipc_recv(NULL, 0, 0);
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
