@@ -150,6 +150,12 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 			// 		break;
 			// 	}
 			// }
+			for (int i = 0; i < n; i++) {
+				if (output[i] == '\n' || output[i] == '\r') {
+					output[i] = '\0';
+					break;
+				}
+			}
 			output[n] = '\0';
 		} else {
 			output[0] = '\0';
@@ -330,11 +336,11 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				child_tag = 0;
 				int result = ipc_recv(NULL, 0, 0);
-				if (*rightpipe == 0){
-					dup(1, 0);
-				} else if (*rightpipe == 1) {
-					dup(0, 1);
-				}
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
 				wait(r);
 				if (result != 0) {
 					lazy = 1;
@@ -356,11 +362,11 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				int result = ipc_recv(NULL, 0, 0);
 				child_tag = 0;
-				if (*rightpipe == 0){
-					dup(1, 0);
-				} else if (*rightpipe == 1) {
-					dup(0, 1);
-				}
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
 				wait(r);
 				if (result == 0) {
 					lazy = -1;
