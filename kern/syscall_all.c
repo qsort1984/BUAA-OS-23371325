@@ -8,6 +8,7 @@
 // #include <env_var.h>
 
 extern struct Env *curenv;
+extern struct Env envs[NENV];
 
 #include <string.h>
 
