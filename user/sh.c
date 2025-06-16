@@ -50,14 +50,14 @@ int _gettoken(char *s, char **p1, char **p2) {
 		return 0;
 	}
 
-	// 识别单引号括起的内容
+	// 识别反引号括起的内容
 	if (*s == '`') {
 		s++;
 		*p1 = s;
 		while (*s && *s != '`') {
 			s++;
 		}
-		if (*s == '\'') {
+		if (*s == '`') {
 			*s++ = 0;
 		}
 		*p2 = s;
@@ -75,11 +75,10 @@ int _gettoken(char *s, char **p1, char **p2) {
     }
 
 	if (*s == '>' && *(s + 1) == '>') {
-		int t = 302;
         *s++ = 0;
         *s++ = 0;
         *p2 = s;
-        return t;
+        return 302;
 	}
 
 	if (strchr(SYMBOLS, *s)) {
