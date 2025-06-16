@@ -59,6 +59,14 @@ int _gettoken(char *s, char **p1, char **p2) {
         return t;
     }
 
+	if (*s == '>' && *(s + 1) == '>') {
+		int t = 302;
+        *s++ = 0;
+        *s++ = 0;
+        *p2 = s;
+        return t;
+	}
+
 	if (strchr(SYMBOLS, *s)) {
 		int t = *s;
 		*p1 = s;
@@ -330,6 +338,23 @@ int parsecmd(char **argv, int *rightpipe) {
 				}
 				return parsecmd(argv, rightpipe);
 			}
+			break;
+		case 302:
+			// >>
+			if (gettoken(0, &t) != 'w') {
+				debugf("syntax error: > not followed by word\n");
+				exit();
+			}
+			fd = open(t, O_WRONLY | O_CREAT);
+			if (fd < 0) {
+				debugf("failed to open '%s'\n", t);
+				exit();
+			}
+			struct Fd *fd_struct = (struct Fd*) num2fd(fd);
+			struct Filefd *ffd = (struct Filefd*) fd_struct;
+			fd_struct->fd_offset = ffd->f_file.f_size;
+			dup(fd, 1);
+			close(fd);
 			break;
 		}
 	}
