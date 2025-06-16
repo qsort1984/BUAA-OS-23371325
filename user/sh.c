@@ -151,7 +151,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 			// 	}
 			// }
 			for (int i = 0; i < n; i++) {
-				if (output[i] == '\n' || output[i] == '\r') {
+				if (output[i] == '\n' || output[i] == '\r' || output == ' ' || output == '\t') {
 					output[i] = '\0';
 					break;
 				}
@@ -797,7 +797,7 @@ int main(int argc, char **argv) {
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
 	shell_id = syscall_shell_id_alloc();
-	if ((r = open("/.mos_history", O_CREAT | O_TRUNC)) < 0) {
+	if ((r = open("/.mos_history", O_CREAT)) < 0) {
 		user_panic("open /.mos_history: %d", r);
 	}
 	close(r);
