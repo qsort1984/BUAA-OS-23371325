@@ -151,6 +151,7 @@ int expand_var(char *buffer, const char *word) {
 		} else if (*word == '`') {
 			char tmp[MAX_ARGV_LEN];
 			char *q = tmp;
+			word++;
 			while (*word && *word != '`') {
 				*q++ = *word++;
 			}
