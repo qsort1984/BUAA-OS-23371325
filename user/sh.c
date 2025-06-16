@@ -146,8 +146,10 @@ int expand_var(char *buffer, const char *word) {
 				tmp[i++] = *word++;
 			}
 			tmp[i] = '\0';
-			try(syscall_get_env_var(buffer, tmp, shell_id));
-			buffer += strlen(buffer);
+			chat buffer_tmp[MAX_ARGV_LEN];
+			try(syscall_get_env_var(buffer_tmp, tmp, shell_id));
+			strcpy(buffer, buffer_tmp);
+			buffer += strlen(buffer_tmp);
 		} else if (*word == '`') {
 			char tmp[MAX_ARGV_LEN];
 			char *q = tmp;
