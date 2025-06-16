@@ -135,7 +135,8 @@ int run_command_and_capture_output(const char *cmd, char *output) {
     return 0;
 }
 
-int expand_var(char *buffer, const char *word) {
+int expand_var(const char *buffer, const char *word) {
+	char *buffer_copy = buffer;
 	while (*word) {
 		if (*word == '$') {
 			int len = strlen(word);
@@ -146,10 +147,8 @@ int expand_var(char *buffer, const char *word) {
 				tmp[i++] = *word++;
 			}
 			tmp[i] = '\0';
-			char buffer_tmp[MAX_ARGV_LEN];
-			try(syscall_get_env_var(buffer_tmp, tmp, shell_id));
-			strcpy(buffer, buffer_tmp);
-			buffer += strlen(buffer_tmp);
+			try(syscall_get_env_var(buffer_copy, tmp, shell_id));
+			buffer_copy += strlen(buffer_copy);
 		} else if (*word == '`') {
 			char tmp[MAX_ARGV_LEN];
 			char *q = tmp;
@@ -158,13 +157,13 @@ int expand_var(char *buffer, const char *word) {
 				*q++ = *word++;
 			}
 			*q = '\0';
-			try(run_command_and_capture_output(tmp, buffer));
-			buffer += strlen(buffer);
+			try(run_command_and_capture_output(tmp, buffer_copy));
+			buffer_copy += strlen(buffer_copy);
 		} else {
-			*buffer++ = *word++;
+			*buffer_copy++ = *word++;
 		}
 	}
-	*buffer = '\0';
+	*buffer_copy = '\0';
 
 	return 0;
 }
@@ -186,6 +185,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				debugf("too many arguments\n");
 				exit();
 			}
+			buffer[argc][0] = '\0';
 			try(expand_var(buffer[argc], t));
 			argv[argc] = buffer[argc];
 			argc++;
