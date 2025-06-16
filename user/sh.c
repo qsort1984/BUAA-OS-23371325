@@ -132,6 +132,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
         dup(p[1], 1); // stdout -> pipe写端
         close(p[1]);
 		close(p[0]);  // 关闭读端
+		printf("cmd is %s and is here\n", cmd);
         runcmd(cmd);
         exit();
 	} else {
@@ -143,7 +144,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		} else {
 			output[0] = '\0';
 		}
-		// printf("here is %s and is here\n", output);
+		printf("output is %s and is here\n", output);
 		close(p[0]);
 		wait(r);
 	}
