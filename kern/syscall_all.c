@@ -682,6 +682,7 @@ int sys_getcwd(char *buf) {
 
 int sys_exit(int exit_status) {
 	curenv->env_exit_status = exit_status;
+	printk("try to set %d's exit %d", curenv->envid, exit_status);
 	return 0;
 }
 
@@ -689,6 +690,7 @@ int sys_get_exit_status(u_int envid) {
 	// struct Env *e;
 	// try(envid2env(envid, &e, 0));
 	struct Env *e = &envs[ENVX(envid)];
+	printk("try to get %d's exit %d", envid, e->env_exit_status);
 	return e->env_exit_status;
 	// if (e->env_status == ENV_FREE) {
 	// 	return e->env_exit_status;
