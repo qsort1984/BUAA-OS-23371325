@@ -335,12 +335,12 @@ int parsecmd(char **argv, int *rightpipe) {
 				return argc;
 			} else {
 				child_tag = 0;
-				int result = ipc_recv(NULL, 0, 0);
-				if (*rightpipe == 0){
-					dup(1, 0);
-				} else if (*rightpipe == 1) {
-					dup(0, 1);
-				}
+				int result = syscall_ipc_recv(0);
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
 				wait(r);
 				if (result != 0) {
 					lazy = 1;
@@ -360,13 +360,13 @@ int parsecmd(char **argv, int *rightpipe) {
 				child_tag = 1;
 				return argc;
 			} else {
-				int result = ipc_recv(NULL, 0, 0);
+				int result = syscall_ipc_recv(0);
 				child_tag = 0;
-				if (*rightpipe == 0){
-					dup(1, 0);
-				} else if (*rightpipe == 1) {
-					dup(0, 1);
-				}
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
 				wait(r);
 				if (result == 0) {
 					lazy = -1;
@@ -531,11 +531,11 @@ int runcmd(char *s) {
 	if (lazy != 0) {
 		if (lazy == 1) { // &&
 			if (child_tag) {
-				ipc_send(syscall_get_parent_id(), 1, NULL, 0);
+				syscall_ipc_try_send(syscall_get_parent_id(), 1, NULL, 0);
 			}
 		} else { // ||
 			if (child_tag) {
-				ipc_send(syscall_get_parent_id(), 0, NULL, 0);
+				syscall_ipc_try_send(syscall_get_parent_id(), 0, NULL, 0);
 			}
 		}
 		lazy = 0;
@@ -543,12 +543,12 @@ int runcmd(char *s) {
 	}
 
 	int child = spawn(argv[0], argv);
-	u_int caller;
-	int res = ipc_recv(&caller, 0, 0);
+	// u_int caller;
+	int res = syscall_ipc_recv(0);
 	close_all();
 	if (child >= 0) {
 		if (child_tag == 1) {
-			ipc_send(syscall_get_parent_id(), res, NULL, 0);
+			syscall_ipc_try_send(syscall_get_parent_id(), res, NULL, 0);
 		}
 		wait(child);
 	} else {
