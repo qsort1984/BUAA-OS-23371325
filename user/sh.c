@@ -141,7 +141,11 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		int n = read(p[0], output, MAX_ARGV_LEN - 1);
 		if (n >= 0) {
 			for (int i = 0; i < n; i++) {
-				if (output[i] == '\n' || output[i] == '\r' || output[i] == ' ' || output[i] == '\t') {
+				if (output[i] == '\n' || output[i] == '\r' || 
+					(output[i] == ' ' && output[i + 1] == ' ') || 
+					(output[i] == ' ' && output[i + 1] == '\t') ||
+					(output[i] == '\t' && output[i + 1] == ' ') ||
+					(output[i] == '\t' && output[i + 1] == '\t')) {
 					output[i] = '\0';
 					break;
 				}
