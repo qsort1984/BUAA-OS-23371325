@@ -173,7 +173,9 @@ int expand_var(const char *buffer, const char *word) {
 				*q++ = *word++;
 			}
 			*q = '\0';
+			printf("tmp is %s is here\n", tmp);
 			try(run_command_and_capture_output(tmp, buffer_copy));
+			printf("buffer_copy is %s is here\n", buffer_copy);
 			buffer_copy += strlen(buffer_copy);
 		} else {
 			*buffer_copy++ = *word++;
