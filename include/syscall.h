@@ -29,6 +29,7 @@ enum {
 	SYS_print_vars,
 	SYS_declare_env_var,
 	SYS_get_env_var,
+	SYS_get_parent_id,
 	MAX_SYSNO,
 };
 

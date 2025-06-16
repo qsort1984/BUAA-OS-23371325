@@ -469,11 +469,11 @@ int runcmd(char *s) {
 	if (lazy != 0) {
 		if (lazy == 1) { // &&
 			if (child_tag) {
-				ipc_send(syscall_get_parent(), 1, NULL, 0);
+				ipc_send(syscall_get_parent_id(), 1, NULL, 0);
 			}
 		} else { // ||
 			if (child_tag) {
-				ipc_send(syscall_get_parent(), 0, NULL, 0);
+				ipc_send(syscall_get_parent_id(), 0, NULL, 0);
 			}
 		}
 		lazy = 0;

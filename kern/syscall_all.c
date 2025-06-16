@@ -147,6 +147,10 @@ u_int sys_getenvid(void) {
 	return curenv->env_id;
 }
 
+u_int sys_get_parent_id(void) {
+	return curenv->env_parent_id;
+}
+
 /* Overview:
  *   Give up remaining CPU time slice for 'curenv'.
  *
@@ -701,6 +705,7 @@ void *syscall_table[MAX_SYSNO] = {
 	[SYS_print_vars] = sys_print_vars,
 	[SYS_declare_env_var] = sys_declare_env_var,
 	[SYS_get_env_var] = sys_get_env_var,
+	[SYS_get_parent_id] = sys_get_parent_id,
 };
 
 /* Overview:

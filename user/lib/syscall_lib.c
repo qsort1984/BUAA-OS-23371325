@@ -102,3 +102,7 @@ int syscall_declare_env_var(char *name, char *value, int shell_id, int readonly)
 int syscall_get_env_var(char *ret, char *name, int shell_id) {
 	return msyscall(SYS_get_env_var, ret, name, shell_id);
 }
+
+u_int syscall_get_parent_id(void) {
+	return msyscall(SYS_get_parent_id);
+}
