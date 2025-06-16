@@ -689,10 +689,11 @@ int sys_get_exit_status(u_int envid) {
 	// struct Env *e;
 	// try(envid2env(envid, &e, 0));
 	struct Env *e = &envs[ENVX(envid)];
-	if (e->env_status == ENV_FREE) {
-		return e->env_exit_status;
-	}
-	return -1;
+	return e->env_exit_status;
+	// if (e->env_status == ENV_FREE) {
+	// 	return e->env_exit_status;
+	// }
+	// return -1;
 }
 
 void *syscall_table[MAX_SYSNO] = {
