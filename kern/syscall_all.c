@@ -687,7 +687,10 @@ int sys_exit(int exit_status) {
 int sys_get_exit_status(u_int envid) {
 	struct Env *e;
 	envid2env(envid, &e, 0);
-	return e->env_exit_status;
+	if (e->env_status == ENV_FREE) {
+		return e->env_exit_value;
+	}
+	return -1;
 }
 
 void *syscall_table[MAX_SYSNO] = {
