@@ -26,9 +26,9 @@ void libmain(int argc, char **argv) {
 	env = &envs[ENVX(syscall_getenvid())];
 
 	// call user main routine
-	printf("1\n");
+	// printf("1\n");
 	exit_status = main(argc, argv);
-	printf("exit_status = %d\n", exit_status);
+	// printf("exit_status = %d\n", exit_status);
 	syscall_exit(exit_status);
 
 	// exit gracefully
