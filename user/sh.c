@@ -114,6 +114,10 @@ int gettoken(char *s, char **p1) {
 	return c;
 }
 
+int isWhite(char c) {
+	return c == '\n' || c == '\r' || c == ' ' || c == '\t';
+}
+
 int run_command_and_capture_output(const char *cmd, char *output) {
     int p[2];
 	int r = pipe(p);
@@ -142,10 +146,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		if (n >= 0) {
 			for (int i = 0; i < n; i++) {
 				if (output[i] == '\n' || output[i] == '\r' || 
-					(output[i] == ' ' && output[i + 1] == ' ') || 
-					(output[i] == ' ' && output[i + 1] == '\t') ||
-					(output[i] == '\t' && output[i + 1] == ' ') ||
-					(output[i] == '\t' && output[i + 1] == '\t')) {
+					(isWhite(output[i]) && isWhite(output[i + 1]))) {
 					output[i] = '\0';
 					break;
 				}
