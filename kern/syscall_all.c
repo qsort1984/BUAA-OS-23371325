@@ -682,7 +682,7 @@ int sys_getcwd(char *buf) {
 
 int sys_exit(int exit_status) {
 	curenv->env_exit_status = exit_status;
-	printk("try to set %d's exit %d", curenv->envid, exit_status);
+	printk("try to set %d's exit %d", curenv->env_id, exit_status);
 	return 0;
 }
 
