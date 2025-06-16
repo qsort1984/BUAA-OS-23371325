@@ -52,7 +52,6 @@ int _gettoken(char *s, char **p1, char **p2) {
 
 	// 识别反引号括起的内容
 	// 反引号也要被视为一部分
-	// todo
 	if (*s == '`') {
 		*p1 = s;
 		s++;
@@ -331,11 +330,11 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				child_tag = 0;
 				int result = ipc_recv(NULL, 0, 0);
-				// if (*rightpipe == 0){
-				// 	dup(1, 0);
-				// } else if (*rightpipe == 1) {
-				// 	dup(0, 1);
-				// }
+				if (*rightpipe == 0){
+					dup(1, 0);
+				} else if (*rightpipe == 1) {
+					dup(0, 1);
+				}
 				wait(r);
 				if (result != 0) {
 					lazy = 1;
@@ -357,11 +356,11 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				int result = ipc_recv(NULL, 0, 0);
 				child_tag = 0;
-				// if (*rightpipe == 0){
-				// 	dup(1, 0);
-				// } else if (*rightpipe == 1) {
-				// 	dup(0, 1);
-				// }
+				if (*rightpipe == 0){
+					dup(1, 0);
+				} else if (*rightpipe == 1) {
+					dup(0, 1);
+				}
 				wait(r);
 				if (result == 0) {
 					lazy = -1;
