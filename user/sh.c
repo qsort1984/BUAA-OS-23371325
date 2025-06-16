@@ -166,6 +166,7 @@ int expand_var(const char *buffer, const char *word) {
 			try(syscall_get_env_var(buffer_copy, tmp, shell_id));
 			buffer_copy += strlen(buffer_copy);
 		} else if (*word == '`') {
+			printf("word is %s is here\n", word);
 			char tmp[MAX_ARGV_LEN];
 			char *q = tmp;
 			word++;
