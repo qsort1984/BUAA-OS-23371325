@@ -792,7 +792,7 @@ int main(int argc, char **argv) {
 	int echocmds = 0;
 	shell_envid = syscall_getenvid();
 	shell_id = syscall_shell_id_alloc();
-	if ((r = open("/.mos_history", O_CREAT)) < 0) {
+	if ((r = open("/.mos_history", O_CREAT | O_TRUNC)) < 0) {
 		user_panic("open /.mos_history: %d", r);
 	}
 	close(r);
