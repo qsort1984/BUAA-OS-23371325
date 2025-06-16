@@ -205,8 +205,8 @@ int expand_var(const char *buffer, const char *word) {
 	return 0;
 }
 
-int child_tag = 0; // 为 1 时表示为子进程
-int lazy = 0; // 懒位，不为 0 时不执行后续指令 1 -> && -1 -> ||
+// int child_tag = 0; // 为 1 时表示为子进程
+// int lazy = 0; // 懒位，不为 0 时不执行后续指令 1 -> && -1 -> ||
 
 int parsecmd(char **argv, int *rightpipe) {
 	int argc = 0;
@@ -331,21 +331,29 @@ int parsecmd(char **argv, int *rightpipe) {
 				exit();
 			}
 			if (r == 0) {
-				child_tag = 1;
+				// child_tag = 1;
 				return argc;
 			} else {
-				child_tag = 0;
+				// child_tag = 0;
 				int result = ipc_recv(NULL, 0, 0);
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
 				// } else if (*rightpipe == 1) {
 				// 	dup(0, 1);
 				// }
-				wait(r);
+				// wait(r);
+				// if (result != 0) {
+				// 	lazy = 1;
+				// } else {
+				// 	lazy = 0;
+				// }
 				if (result != 0) {
-					lazy = 1;
-				} else {
-					lazy = 0;
+					do {
+						c = gettoken(0, &t);
+					} while (c && c != 301);
+					if (c != 301) {
+						return 0;
+					}
 				}
 				return parsecmd(argv, rightpipe);
 			}
@@ -361,17 +369,25 @@ int parsecmd(char **argv, int *rightpipe) {
 				return argc;
 			} else {
 				int result = ipc_recv(NULL, 0, 0);
-				child_tag = 0;
+				// child_tag = 0;
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
 				// } else if (*rightpipe == 1) {
 				// 	dup(0, 1);
 				// }
-				wait(r);
+				// wait(r);
+				// if (result == 0) {
+				// 	lazy = -1;
+				// } else {
+				// 	lazy = 0;
+				// }
 				if (result == 0) {
-					lazy = -1;
-				} else {
-					lazy = 0;
+					do {
+						c = gettoken(0, &t);
+					} while (c && c != 300);
+					if (c != 300) {
+						return 0;
+					}
 				}
 				return parsecmd(argv, rightpipe);
 			}
@@ -528,19 +544,19 @@ int runcmd(char *s) {
 	}
 
 	// 条件执行
-	if (lazy != 0) {
-		if (lazy == 1) { // &&
-			if (child_tag) {
-				ipc_send(syscall_get_parent_id(), 1, NULL, 0);
-			}
-		} else { // ||
-			if (child_tag) {
-				ipc_send(syscall_get_parent_id(), 0, NULL, 0);
-			}
-		}
-		lazy = 0;
-		exit();
-	}
+	// if (lazy != 0) {
+	// 	if (lazy == 1) { // &&
+	// 		if (child_tag) {
+	// 			ipc_send(syscall_get_parent_id(), 1, NULL, 0);
+	// 		}
+	// 	} else { // ||
+	// 		if (child_tag) {
+	// 			ipc_send(syscall_get_parent_id(), 0, NULL, 0);
+	// 		}
+	// 	}
+	// 	lazy = 0;
+	// 	exit();
+	// }
 
 	int child = spawn(argv[0], argv);
 	// int res = ipc_recv(NULL, 0, 0);
