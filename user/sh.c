@@ -336,6 +336,7 @@ int parsecmd(char **argv, int *rightpipe) {
 			} else {
 				// child_tag = 0;
 				int result = wait(r);
+				printf("return value is %d\n", result);
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
 				// } else if (*rightpipe == 1) {
@@ -369,6 +370,7 @@ int parsecmd(char **argv, int *rightpipe) {
 				return argc;
 			} else {
 				int result = wait(r);
+				printf("return value is %d\n", result);
 				// child_tag = 0;
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
