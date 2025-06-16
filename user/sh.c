@@ -143,19 +143,19 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		close(p[1]);  // 关闭写端
 		int n = read(p[0], output, MAX_ARGV_LEN - 1);
 		if (n >= 0) {
-			// for (int i = 0; i < n; i++) {
-			// 	if (output[i] == '\n' || output[i] == '\r' || 
-			// 		(isWhite(output[i]) && isWhite(output[i + 1]))) {
-			// 		output[i] = '\0';
-			// 		break;
-			// 	}
-			// }
 			for (int i = 0; i < n; i++) {
-				if (output[i] == '\n' || output[i] == '\r' || output == ' ' || output == '\t') {
+				if (output[i] == '\n' || output[i] == '\r' || 
+					(isWhite(output[i]) && isWhite(output[i + 1]))) {
 					output[i] = '\0';
 					break;
 				}
 			}
+			// for (int i = 0; i < n; i++) {
+			// 	if (output[i] == '\n' || output[i] == '\r' || output == ' ' || output == '\t') {
+			// 		output[i] = '\0';
+			// 		break;
+			// 	}
+			// }
 			output[n] = '\0';
 		} else {
 			output[0] = '\0';
