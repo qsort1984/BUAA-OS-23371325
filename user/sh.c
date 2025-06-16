@@ -335,7 +335,6 @@ int parsecmd(char **argv, int *rightpipe) {
 				return argc;
 			} else {
 				// child_tag = 0;
-				wait(r);
 				int result = wait(r);
 				// if (*rightpipe == 0){
 				// 	dup(1, 0);
