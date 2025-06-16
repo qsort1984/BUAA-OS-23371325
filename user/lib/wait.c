@@ -8,5 +8,6 @@ int wait(u_int envid) {
 		syscall_yield();
 	}
 
-	return syscall_get_exit_status(envid);
+	return 0;
+	// return syscall_get_exit_status(envid);
 }
