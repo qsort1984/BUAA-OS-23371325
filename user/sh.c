@@ -129,11 +129,10 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 
 	if (r == 0) {
 		// 子进程
-        dup(p[1], 1); // stdout -> pipe写端
-        close(p[1]);
 		close(p[0]);  // 关闭读端
-		printf("cmd is %s and is here\n", cmd);
+        dup(p[1], 1); // stdout -> pipe写端
         runcmd(cmd);
+		close(p[1]);
         exit();
 	} else {
 		// 父进程
