@@ -50,6 +50,15 @@ int _gettoken(char *s, char **p1, char **p2) {
 		return 0;
 	}
 
+	// 识别 || 和 &&
+	if ((*s == '&' && *(s + 1) == '&') || (*s == '|' && *(s + 1) == '|')) {
+        int t = (*s == '&') ? 300 : 301;
+        *s++ = 0;
+        *s++ = 0;
+        *p2 = s;
+        return t;
+    }
+
 	if (strchr(SYMBOLS, *s)) {
 		int t = *s;
 		*p1 = s;
@@ -151,6 +160,9 @@ int expand_var(char *buffer, const char *word) {
 
 	return 0;
 }
+
+int child_tag = 0; // 为 1 时表示为子进程
+int lazy = 0; // 懒位，不为 0 时不执行后续指令 1 -> && -1 -> ||
 
 int parsecmd(char **argv, int *rightpipe) {
 	int argc = 0;
@@ -266,6 +278,59 @@ int parsecmd(char **argv, int *rightpipe) {
 				wait(r);
 				return parsecmd(argv, rightpipe);
 			}
+			break;
+		case 300:
+			// &&
+			if ((r = fork()) < 0) { 
+				debugf("fork: %d\n", r);
+				exit();
+			}
+			if (r == 0) {
+				child_tag = 1;
+				return argc;
+			} else {
+				tag = 0;
+				int result = ipc_recv(NULL, 0, 0);
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
+				wait(r);
+				if (result != 0) {
+					lazy = 1;
+				} else {
+					lazy = 0;
+				}
+				return parsecmd(argv, rightpipe);
+			}
+			break;
+		case 301:
+			// ||
+			if ((r = fork()) < 0) { 
+				debugf("fork: %d\n", r);
+				exit();
+			}
+			if (r == 0) {
+				child_tag = 1;
+				return argc;
+			} else {
+				int result = ipc_recv(NULL, 0, 0);
+				child_tag = 0;
+				// if (*rightpipe == 0){
+				// 	dup(1, 0);
+				// } else if (*rightpipe == 1) {
+				// 	dup(0, 1);
+				// }
+				wait(r);
+				if (result == 0) {
+					lazy = -1;
+				} else {
+					lazy = 0;
+				}
+				return parsecmd(argv, rightpipe);
+			}
+			break;
 		}
 	}
 
@@ -366,27 +431,6 @@ int unset(int argc, char *argv[]) {
 
 int history(int argc, char **argv) {
 	if (argc == 1) {
-		// todo
-		// int r, fd;
-		// if ((fd = open("/.mosh_history", O_RDONLY)) < 0) {
-		// 	debugf("open /.mos_history: %d", r);
-		// 	return 1;
-		// }
-		// char history_buf[MAX_ARGV_LEN];
-		// for (int i = 0; i < MAX_ARGV_LEN; i++) {
-		// 	if ((r = read(fd, history_buf + i, 1)) != 1) {
-		// 		if (r < 0) {
-		// 			debugf("read error: %d\n", r);
-		// 		}
-		// 		break;
-		// 	}
-		// }
-		// printf("%s", history_buf);
-		// close(fd);
-		// close_all();
-		// if (rightpipe) {
-		// 	wait(rightpipe);
-		// }
 		argv[0] = "/cat.b";
 		argv[1] = "/.mos_history";
 	} else {
@@ -419,6 +463,21 @@ int runcmd(char *s) {
 		return unset(argc, argv);
 	} else if (strcmp(argv[0], "history") == 0) {
 		try(history(argc, argv));
+	}
+
+	// 条件执行
+	if (lazy != 0) {
+		if (lazy == 1) { // &&
+			if (child_tag) {
+				ipc_send(syscall_get_parent(), 1, NULL, 0);
+			}
+		} else { // ||
+			if (child_tag) {
+				ipc_send(syscall_get_parent(), 0, NULL, 0);
+			}
+		}
+		lazy = 0;
+		exit();
 	}
 
 	int child = spawn(argv[0], argv);
