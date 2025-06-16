@@ -543,13 +543,13 @@ int runcmd(char *s) {
 	}
 
 	int child = spawn(argv[0], argv);
-	// u_int caller;
-	// int res = ipc_recv(&caller, 0, 0);
+	u_int caller;
+	int res = ipc_recv(&caller, 0, 0);
 	close_all();
 	if (child >= 0) {
-		// if (child_tag == 1) {
-		// 	ipc_send(syscall_get_parent_id(), res, NULL, 0);
-		// }
+		if (child_tag == 1) {
+			ipc_send(syscall_get_parent_id(), res, NULL, 0);
+		}
 		wait(child);
 	} else {
 		debugf("spawn %s: %d\n", argv[0], child);

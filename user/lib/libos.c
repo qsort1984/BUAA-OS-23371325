@@ -9,7 +9,8 @@ void exit(void) {
 	close_all();
 #endif
 
-	syscall_ipc_try_send(env->env_parent_id, exit_status, 0, 0);
+	// syscall_ipc_try_send(env->env_parent_id, exit_status, 0, 0);
+	ipc_send(env->env_parent_id, exit_status, 0, 0);
 	syscall_env_destroy(0);
 	user_panic("unreachable code");
 }
