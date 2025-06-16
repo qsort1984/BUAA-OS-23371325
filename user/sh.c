@@ -543,7 +543,7 @@ int runcmd(char *s) {
 	close_all();
 	if (child >= 0) {
 		if (child_tag == 1) {
-			ipc_send(syscall_get_parent(), res, NULL, 0);
+			ipc_send(syscall_get_parent_id(), res, NULL, 0);
 		}
 		wait(child);
 	} else {
