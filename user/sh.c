@@ -131,6 +131,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		close(p[0]);
 		wait(r);
 	}
+	printf("here is %s\n", output);
 
     return 0;
 }
