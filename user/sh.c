@@ -143,6 +143,7 @@ int run_command_and_capture_output(const char *cmd, char *output) {
 		} else {
 			output[0] = '\0';
 		}
+		printf("here is %s and is here\n", output);
 		close(p[0]);
 		wait(r);
 	}
