@@ -543,7 +543,7 @@ int runcmd(char *s) {
 	}
 
 	int child = spawn(argv[0], argv);
-	int res = ipc_recv(NULL, 0, 0);
+	// int res = ipc_recv(NULL, 0, 0);
 	close_all();
 	if (child >= 0) {
 		// if (child_tag == 1) {
@@ -876,7 +876,7 @@ int main(int argc, char **argv) {
 			user_panic("fork: %d", r);
 		}
 		if (r == 0) {
-			runcmd(buf);
+			try(runcmd(buf));
 			exit();
 		} else {
 			wait(r);
