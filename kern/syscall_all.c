@@ -685,11 +685,11 @@ int sys_exit(int exit_status) {
 }
 
 int sys_get_exit_status(u_int envid) {
-	struct Env *e;
-	envid2env(envid, &e, 0);
-	if (e->env_status == ENV_FREE) {
-		return e->env_exit_status;
-	}
+	// struct Env *e;
+	// try(envid2env(envid, &e, 0));
+	// if (e->env_status == ENV_FREE) {
+	// 	return e->env_exit_status;
+	// }
 	return -1;
 }
 
