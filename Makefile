@@ -1,11 +1,16 @@
 include include.mk
 
 lab                     ?= $(shell cat .mos-this-lab 2>/dev/null || echo 6)
+# ----- MOS BLANK BEGIN -----
+CFLAGS                  += -Werror -Wa,--fatal-warnings
+HOST_CFLAGS             += -Werror -Wa,--fatal-warnings
+# ----- MOS BLANK END -----
 
 target_dir              := target
 mos_elf                 := $(target_dir)/mos
 user_disk               := $(target_dir)/fs.img
 empty_disk              := $(target_dir)/empty.img
+swap_disk				:= $(target_dir)/swap.img
 qemu_pts                := $(shell [ -f .qemu_log ] && grep -Eo '/dev/pts/[0-9]+' .qemu_log)
 link_script             := kernel.lds
 
@@ -38,6 +43,7 @@ CFLAGS                  += -DLAB=$(shell echo $(lab) | cut -f1 -d_)
 QEMU_FLAGS              += -cpu 4Kc -m 64 -nographic -M malta \
 						$(shell [ -f '$(user_disk)' ] && echo '-drive id=ide0,file=$(user_disk),if=ide,format=raw') \
 						$(shell [ -f '$(empty_disk)' ] && echo '-drive id=ide1,file=$(empty_disk),if=ide,format=raw') \
+						$(shell [ -f '$(swap_disk)' ] && echo '-drive id=swap,file=$(swap_disk),if=ide,format=raw') \
 						-no-reboot
 
 .PHONY: all test tools $(modules) clean run dbg_run dbg_pts dbg objdump fs-image clean-and-all connect
@@ -73,6 +79,10 @@ fs: user
 user: lib
 
 clean:
+# ----- MOS BLANK BEGIN -----
+	[ -d quizs ] && cp tests/include.mk quizs/tests/
+	rm -rf include/preload .mos-crypt-*
+# ----- MOS BLANK END -----
 	for d in * tools/readelf user/* tests/*; do
 		if [ -f $$d/Makefile ]; then
 			$(MAKE) --directory=$$d clean
@@ -103,3 +113,25 @@ connect:
 objdump:
 	@find * \( -name '*.b' -o -path $(mos_elf) \) -exec sh -c \
 	'$(CROSS_COMPILE)objdump {} -aldS > {}.objdump && echo {}.objdump' ';'
+# ----- MOS BLANK BEGIN -----
+.PHONY: judge quiz quiz-judge check-style fix-style register-git-hooks
+
+judge: test
+	judges/judge lab$(lab) $(judge_flags) -v
+
+quiz:
+	cp tests/include.mk quizs/tests/
+	test_dir=quizs/tests/lab$(lab) $(MAKE) clean-and-all root_dir='$(PWD)'
+
+quiz-judge: quiz
+	judges/judge -d quizs/judges/lab$(lab) $(judge_flags) -v
+
+check-style: clean
+	judges/check-style
+
+fix-style: clean
+	judges/check-style -f
+
+register-git-hooks:
+	ln -s ../../judges/pre-commit .git/hooks/pre-commit
+# ----- MOS BLANK END -----
